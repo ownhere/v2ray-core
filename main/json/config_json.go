@@ -6,12 +6,15 @@ import (
 	"context"
 	"io"
 	"os"
-	"os/exec"
 
 	"v2ray.com/core"
 	"v2ray.com/core/common"
 	"v2ray.com/core/common/platform"
 	"v2ray.com/core/common/signal"
+
+	"github.com/gogo/protobuf/proto"
+	"v2ray.com/ext/tools/conf/serial"
+	"bytes"
 )
 
 type logWriter struct{}
@@ -25,24 +28,19 @@ func (*logWriter) Write(b []byte) (int, error) {
 }
 
 func jsonToProto(input io.Reader) (*core.Config, error) {
-	v2ctl := platform.GetToolLocation("v2ctl")
-	if _, err := os.Stat(v2ctl); err != nil {
-		return nil, err
-	}
-	cmd := exec.Command(v2ctl, "config")
-	cmd.Stdin = input
-	cmd.Stderr = &logWriter{}
-	cmd.SysProcAttr = getSysProcAttr()
-
-	stdoutReader, err := cmd.StdoutPipe()
+	pbConfig, err := serial.LoadJSONConfig(input)
 	if err != nil {
-		return nil, err
+		os.Stderr.WriteString("failed to parse json config: " + err.Error())
+		os.Exit(-1)
 	}
-	defer stdoutReader.Close()
 
-	if err := cmd.Start(); err != nil {
-		return nil, err
+	bytesConfig, err := proto.Marshal(pbConfig)
+	if err != nil {
+		os.Stderr.WriteString("failed to marshal proto config: " + err.Error())
+		os.Exit(-1)
 	}
+
+	stdoutReader := bytes.NewReader(bytesConfig)
 
 	var config *core.Config
 
@@ -55,11 +53,7 @@ func jsonToProto(input io.Reader) (*core.Config, error) {
 		return nil
 	})
 
-	waitTask := signal.ExecuteAsync(func() error {
-		return cmd.Wait()
-	})
-
-	if err := signal.ErrorOrFinish2(context.Background(), loadTask, waitTask); err != nil {
+	if err := signal.ErrorOrFinish1(context.Background(), loadTask); err != nil {
 		return nil, err
 	}
 
