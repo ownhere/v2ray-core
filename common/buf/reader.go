@@ -19,19 +19,28 @@ func NewBytesToBufferReader(reader io.Reader) Reader {
 	}
 }
 
-const xlSize = 128 * 1024
-
 func (r *BytesToBufferReader) readSmall() (MultiBuffer, error) {
 	b := New()
-	err := b.Reset(ReadFrom(r.Reader))
-	if b.IsFull() {
-		r.buffer = newBytes(Size + 1)
+	for i := 0; i < 64; i++ {
+		err := b.Reset(ReadFrom(r.Reader))
+		if b.IsFull() {
+			r.buffer = newBytes(Size + 1)
+		}
+		if !b.IsEmpty() {
+			return NewMultiBufferValue(b), nil
+		}
+		if err != nil {
+			b.Release()
+			return nil, err
+		}
 	}
-	if !b.IsEmpty() {
-		return NewMultiBufferValue(b), nil
-	}
-	b.Release()
-	return nil, err
+
+	return nil, newError("Reader returns too many empty payloads.")
+}
+
+func (r *BytesToBufferReader) freeBuffer() {
+	freeBytes(r.buffer)
+	r.buffer = nil
 }
 
 // ReadMultiBuffer implements Reader.
@@ -42,20 +51,25 @@ func (r *BytesToBufferReader) ReadMultiBuffer() (MultiBuffer, error) {
 
 	nBytes, err := r.Reader.Read(r.buffer)
 	if nBytes > 0 {
-		mb := NewMultiBufferCap(nBytes/Size + 1)
+		mb := NewMultiBufferCap(int32(nBytes/Size) + 1)
 		mb.Write(r.buffer[:nBytes])
-		if nBytes == len(r.buffer) && nBytes < xlSize {
+		if nBytes == len(r.buffer) && nBytes < int(largeSize) {
 			freeBytes(r.buffer)
-			r.buffer = newBytes(uint32(nBytes) + 1)
+			r.buffer = newBytes(int32(nBytes) + 1)
 		} else if nBytes < Size {
-			freeBytes(r.buffer)
-			r.buffer = nil
+			r.freeBuffer()
 		}
 		return mb, nil
 	}
-	freeBytes(r.buffer)
-	r.buffer = nil
-	return nil, err
+
+	r.freeBuffer()
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Read() returns empty payload and nil err. We don't expect this to happen, but just in case.
+	return r.readSmall()
 }
 
 // BufferedReader is a Reader that keeps its internal buffer.
@@ -81,6 +95,11 @@ func (r *BufferedReader) SetBuffered(f bool) {
 // IsBuffered returns true if internal buffer is used.
 func (r *BufferedReader) IsBuffered() bool {
 	return r.buffered
+}
+
+// BufferedBytes returns the number of bytes that is cached in this reader.
+func (r *BufferedReader) BufferedBytes() int32 {
+	return r.leftOver.Len()
 }
 
 // ReadByte implements io.ByteReader.
@@ -130,7 +149,7 @@ func (r *BufferedReader) ReadMultiBuffer() (MultiBuffer, error) {
 }
 
 // ReadAtMost returns a MultiBuffer with at most size.
-func (r *BufferedReader) ReadAtMost(size int) (MultiBuffer, error) {
+func (r *BufferedReader) ReadAtMost(size int32) (MultiBuffer, error) {
 	if r.leftOver == nil {
 		mb, err := r.stream.ReadMultiBuffer()
 		if mb.IsEmpty() && err != nil {
@@ -154,6 +173,7 @@ func (r *BufferedReader) writeToInternal(writer io.Writer) (int64, error) {
 		if err := mbWriter.WriteMultiBuffer(r.leftOver); err != nil {
 			return 0, err
 		}
+		r.leftOver = nil
 	}
 
 	for {

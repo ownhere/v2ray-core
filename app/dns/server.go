@@ -28,11 +28,6 @@ func (r *DomainRecord) Expired() bool {
 	return r.Expire.Before(time.Now())
 }
 
-func (r *DomainRecord) Inactive() bool {
-	now := time.Now()
-	return r.Expire.Before(now) || r.LastAccess.Add(time.Minute*5).Before(now)
-}
-
 type Server struct {
 	sync.Mutex
 	hosts   map[string]net.IP
@@ -85,7 +80,7 @@ func (s *Server) Start() error {
 	return s.task.Start()
 }
 
-// Close implements common.Runnable.
+// Close implements common.Closable.
 func (s *Server) Close() error {
 	return s.task.Close()
 }

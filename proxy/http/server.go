@@ -21,7 +21,7 @@ import (
 	"v2ray.com/core/transport/internet"
 )
 
-// Server is a HTTP proxy server.
+// Server is an HTTP proxy server.
 type Server struct {
 	config *ServerConfig
 	v      *core.Instance
@@ -173,11 +173,11 @@ func (s *Server) handleConnect(ctx context.Context, request *http.Request, reade
 	}
 
 	if reader.Buffered() > 0 {
-		payload := buf.New()
-		common.Must(payload.Reset(func(b []byte) (int, error) {
-			return reader.Read(b[:reader.Buffered()])
-		}))
-		if err := ray.InboundInput().WriteMultiBuffer(buf.NewMultiBufferValue(payload)); err != nil {
+		payload, err := buf.ReadSizeToMultiBuffer(reader, int32(reader.Buffered()))
+		if err != nil {
+			return err
+		}
+		if err := ray.InboundInput().WriteMultiBuffer(payload); err != nil {
 			return err
 		}
 		reader = nil

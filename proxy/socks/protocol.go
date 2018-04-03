@@ -26,10 +26,6 @@ const (
 	authPassword         = 0x02
 	authNoMatchingMethod = 0xFF
 
-	addrTypeIPv4   = 0x01
-	addrTypeIPv6   = 0x04
-	addrTypeDomain = 0x03
-
 	statusSuccess       = 0x00
 	statusCmdNotSupport = 0x07
 )
@@ -96,7 +92,7 @@ func (s *ServerSession) Handshake(reader io.Reader, writer io.Writer) (*protocol
 	}
 
 	if version == socks5Version {
-		nMethod := int(buffer.Byte(1))
+		nMethod := int32(buffer.Byte(1))
 		if err := buffer.AppendSupplier(buf.ReadFullFrom(reader, nMethod)); err != nil {
 			return nil, newError("failed to read auth methods").Base(err)
 		}
@@ -135,16 +131,21 @@ func (s *ServerSession) Handshake(reader io.Reader, writer io.Writer) (*protocol
 		}
 
 		cmd := buffer.Byte(1)
-		if cmd == cmdTCPBind || (cmd == cmdUDPPort && !s.config.UdpEnabled) {
-			writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
-			return nil, newError("unsupported command: ", cmd)
-		}
-
 		switch cmd {
 		case cmdTCPConnect:
 			request.Command = protocol.RequestCommandTCP
 		case cmdUDPPort:
+			if !s.config.UdpEnabled {
+				writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
+				return nil, newError("UDP is not enabled.")
+			}
 			request.Command = protocol.RequestCommandUDP
+		case cmdTCPBind:
+			writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
+			return nil, newError("TCP bind is not supported.")
+		default:
+			writeSocks5Response(writer, statusCmdNotSupport, net.AnyIP, net.Port(0))
+			return nil, newError("unknown command ", cmd)
 		}
 
 		buffer.Clear()
@@ -185,7 +186,7 @@ func readUsernamePassword(reader io.Reader) (string, string, error) {
 	if err := buffer.Reset(buf.ReadFullFrom(reader, 2)); err != nil {
 		return "", "", err
 	}
-	nUsername := int(buffer.Byte(1))
+	nUsername := int32(buffer.Byte(1))
 
 	if err := buffer.Reset(buf.ReadFullFrom(reader, nUsername)); err != nil {
 		return "", "", err
@@ -195,7 +196,7 @@ func readUsernamePassword(reader io.Reader) (string, string, error) {
 	if err := buffer.Reset(buf.ReadFullFrom(reader, 1)); err != nil {
 		return "", "", err
 	}
-	nPassword := int(buffer.Byte(0))
+	nPassword := int32(buffer.Byte(0))
 	if err := buffer.Reset(buf.ReadFullFrom(reader, nPassword)); err != nil {
 		return "", "", err
 	}

@@ -17,10 +17,10 @@ func ReadMetadata(reader io.Reader) (*FrameMetadata, error) {
 		return nil, newError("invalid metalen ", metaLen).AtError()
 	}
 
-	b := buf.New()
+	b := buf.NewSize(int32(metaLen))
 	defer b.Release()
 
-	if err := b.Reset(buf.ReadFullFrom(reader, int(metaLen))); err != nil {
+	if err := b.Reset(buf.ReadFullFrom(reader, int32(metaLen))); err != nil {
 		return nil, err
 	}
 	return ReadFrameFrom(b)
@@ -51,8 +51,8 @@ func (r *PacketReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 		return nil, err
 	}
 
-	b := buf.NewSize(uint32(size))
-	if err := b.AppendSupplier(buf.ReadFullFrom(r.reader, int(size))); err != nil {
+	b := buf.NewSize(int32(size))
+	if err := b.Reset(buf.ReadFullFrom(r.reader, int32(size))); err != nil {
 		b.Release()
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (r *StreamReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 		r.leftOver = int32(size)
 	}
 
-	mb, err := r.reader.ReadAtMost(int(r.leftOver))
-	r.leftOver -= int32(mb.Len())
+	mb, err := r.reader.ReadAtMost(r.leftOver)
+	r.leftOver -= mb.Len()
 	return mb, err
 }

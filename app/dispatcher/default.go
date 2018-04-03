@@ -11,6 +11,7 @@ import (
 	"v2ray.com/core/common"
 	"v2ray.com/core/common/buf"
 	"v2ray.com/core/common/net"
+	"v2ray.com/core/common/protocol"
 	"v2ray.com/core/proxy"
 	"v2ray.com/core/transport/ray"
 )
@@ -23,6 +24,8 @@ var (
 type DefaultDispatcher struct {
 	ohm    core.OutboundHandlerManager
 	router core.Router
+	policy core.PolicyManager
+	stats  core.StatManager
 }
 
 // NewDefaultDispatcher create a new DefaultDispatcher.
@@ -31,6 +34,8 @@ func NewDefaultDispatcher(ctx context.Context, config *Config) (*DefaultDispatch
 	d := &DefaultDispatcher{
 		ohm:    v.OutboundHandlerManager(),
 		router: v.Router(),
+		policy: v.PolicyManager(),
+		stats:  v.Stats(),
 	}
 
 	if err := v.RegisterFeature((*core.Dispatcher)(nil), d); err != nil {
@@ -39,13 +44,51 @@ func NewDefaultDispatcher(ctx context.Context, config *Config) (*DefaultDispatch
 	return d, nil
 }
 
-// Start implements app.Application.
+// Start implements common.Runnable.
 func (*DefaultDispatcher) Start() error {
 	return nil
 }
 
-// Close implements app.Application.
+// Close implements common.Closable.
 func (*DefaultDispatcher) Close() error { return nil }
+
+func getStatsName(u *protocol.User) string {
+	return "user>traffic>" + u.Email
+}
+
+func (d *DefaultDispatcher) getStatCounter(name string) core.StatCounter {
+	c := d.stats.GetCounter(name)
+	if c != nil {
+		return c
+	}
+	c, err := d.stats.RegisterCounter(name)
+	if err != nil {
+		return nil
+	}
+	return c
+}
+
+func (d *DefaultDispatcher) getRayOption(user *protocol.User) []ray.Option {
+	var rayOptions []ray.Option
+
+	if user != nil && len(user.Email) > 0 {
+		p := d.policy.ForLevel(user.Level)
+		if p.Stats.UserUplink {
+			name := "user>>>" + user.Email + ">>>traffic>>>uplink"
+			if c := d.getStatCounter(name); c != nil {
+				rayOptions = append(rayOptions, ray.WithUplinkStatCounter(c))
+			}
+		}
+		if p.Stats.UserDownlink {
+			name := "user>>>" + user.Email + ">>>traffic>>>downlink"
+			if c := d.getStatCounter(name); c != nil {
+				rayOptions = append(rayOptions, ray.WithDownlinkStatCounter(c))
+			}
+		}
+	}
+
+	return rayOptions
+}
 
 // Dispatch implements core.Dispatcher.
 func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destination) (ray.InboundRay, error) {
@@ -54,7 +97,10 @@ func (d *DefaultDispatcher) Dispatch(ctx context.Context, destination net.Destin
 	}
 	ctx = proxy.ContextWithTarget(ctx, destination)
 
-	outbound := ray.NewRay(ctx)
+	user := protocol.UserFromContext(ctx)
+	rayOptions := d.getRayOption(user)
+
+	outbound := ray.New(ctx, rayOptions...)
 	snifferList := proxyman.ProtocolSniffersFromContext(ctx)
 	if destination.Address.Family().IsDomain() || len(snifferList) == 0 {
 		go d.routedDispatch(ctx, outbound, destination)
