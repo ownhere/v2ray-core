@@ -41,7 +41,7 @@ func ReadTCPSession(user *protocol.User, reader io.Reader) (*protocol.RequestHea
 	ivLen := account.Cipher.IVSize()
 	var iv []byte
 	if ivLen > 0 {
-		if err := buffer.AppendSupplier(buf.ReadFullFrom(reader, int32(ivLen))); err != nil {
+		if err := buffer.AppendSupplier(buf.ReadFullFrom(reader, ivLen)); err != nil {
 			return nil, nil, newError("failed to read IV").Base(err)
 		}
 
@@ -138,8 +138,7 @@ func WriteTCPRequest(request *protocol.RequestHeader, writer io.Writer) (buf.Wri
 	if account.Cipher.IVSize() > 0 {
 		iv = make([]byte, account.Cipher.IVSize())
 		common.Must2(rand.Read(iv))
-		_, err = writer.Write(iv)
-		if err != nil {
+		if _, err = writer.Write(iv); err != nil {
 			return nil, newError("failed to write IV")
 		}
 	}
@@ -186,8 +185,7 @@ func ReadTCPResponse(user *protocol.User, reader io.Reader) (buf.Reader, error) 
 	var iv []byte
 	if account.Cipher.IVSize() > 0 {
 		iv = make([]byte, account.Cipher.IVSize())
-		_, err = io.ReadFull(reader, iv)
-		if err != nil {
+		if _, err = io.ReadFull(reader, iv); err != nil {
 			return nil, newError("failed to read IV").Base(err)
 		}
 	}
@@ -207,8 +205,7 @@ func WriteTCPResponse(request *protocol.RequestHeader, writer io.Writer) (buf.Wr
 	if account.Cipher.IVSize() > 0 {
 		iv = make([]byte, account.Cipher.IVSize())
 		common.Must2(rand.Read(iv))
-		_, err = writer.Write(iv)
-		if err != nil {
+		if _, err = writer.Write(iv); err != nil {
 			return nil, newError("failed to write IV.").Base(err)
 		}
 	}
@@ -227,7 +224,7 @@ func EncodeUDPPacket(request *protocol.RequestHeader, payload []byte) (*buf.Buff
 	buffer := buf.New()
 	ivLen := account.Cipher.IVSize()
 	if ivLen > 0 {
-		common.Must(buffer.Reset(buf.ReadFullFrom(rand.Reader, int32(ivLen))))
+		common.Must(buffer.Reset(buf.ReadFullFrom(rand.Reader, ivLen)))
 	}
 	iv := buffer.Bytes()
 
@@ -293,7 +290,7 @@ func DecodeUDPPacket(user *protocol.User, payload *buf.Buffer) (*protocol.Reques
 
 			authenticator := NewAuthenticator(HeaderKeyGenerator(account.Key, iv))
 			actualAuth := make([]byte, AuthSize)
-			authenticator.Authenticate(payload.BytesTo(payloadLen))(actualAuth)
+			common.Must2(authenticator.Authenticate(payload.BytesTo(payloadLen))(actualAuth))
 			if !bytes.Equal(actualAuth, authBytes) {
 				return nil, nil, newError("invalid OTA")
 			}

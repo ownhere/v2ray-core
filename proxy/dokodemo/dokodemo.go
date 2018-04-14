@@ -21,7 +21,6 @@ type DokodemoDoor struct {
 	config        *Config
 	address       net.Address
 	port          net.Port
-	v             *core.Instance
 }
 
 func New(ctx context.Context, config *Config) (*DokodemoDoor, error) {
@@ -76,7 +75,7 @@ func (d *DokodemoDoor) Process(ctx context.Context, network net.Network, conn in
 		return newError("failed to dispatch request").Base(err)
 	}
 
-	requestDone := signal.ExecuteAsync(func() error {
+	requestDone := func() error {
 		defer inboundRay.InboundInput().Close()
 		defer timer.SetTimeout(d.policy().Timeouts.DownlinkOnly)
 
@@ -87,9 +86,9 @@ func (d *DokodemoDoor) Process(ctx context.Context, network net.Network, conn in
 		}
 
 		return nil
-	})
+	}
 
-	responseDone := signal.ExecuteAsync(func() error {
+	responseDone := func() error {
 		defer timer.SetTimeout(d.policy().Timeouts.UplinkOnly)
 
 		var writer buf.Writer
@@ -114,9 +113,9 @@ func (d *DokodemoDoor) Process(ctx context.Context, network net.Network, conn in
 		}
 
 		return nil
-	})
+	}
 
-	if err := signal.ErrorOrFinish2(ctx, requestDone, responseDone); err != nil {
+	if err := signal.ExecuteParallel(ctx, requestDone, responseDone); err != nil {
 		inboundRay.InboundInput().CloseError()
 		inboundRay.InboundOutput().CloseError()
 		return newError("connection ends").Base(err)

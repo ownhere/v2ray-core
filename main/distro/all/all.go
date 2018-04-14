@@ -32,6 +32,7 @@ import (
 	_ "v2ray.com/core/proxy/vmess/outbound"
 
 	// Transports
+	_ "v2ray.com/core/transport/internet/domainsocket"
 	_ "v2ray.com/core/transport/internet/http"
 	_ "v2ray.com/core/transport/internet/kcp"
 	_ "v2ray.com/core/transport/internet/tcp"
@@ -48,4 +49,7 @@ import (
 
 	// JSON config format
 	_ "v2ray.com/core/main/json"
+
+	// Load config from file or http(s)
+	_ "v2ray.com/core/main/confloader/external"
 )

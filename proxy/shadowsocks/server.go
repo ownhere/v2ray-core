@@ -17,7 +17,7 @@ import (
 )
 
 type Server struct {
-	config  *ServerConfig
+	config  ServerConfig
 	user    *protocol.User
 	account *MemoryAccount
 	v       *core.Instance
@@ -36,7 +36,7 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 	account := rawAccount.(*MemoryAccount)
 
 	s := &Server{
-		config:  config,
+		config:  *config,
 		user:    config.GetUser(),
 		account: account,
 		v:       core.MustFromContext(ctx),
@@ -47,7 +47,10 @@ func NewServer(ctx context.Context, config *ServerConfig) (*Server, error) {
 
 func (s *Server) Network() net.NetworkList {
 	list := net.NetworkList{
-		Network: []net.Network{net.Network_TCP},
+		Network: s.config.Network,
+	}
+	if len(list.Network) == 0 {
+		list.Network = append(list.Network, net.Network_TCP)
 	}
 	if s.config.UdpEnabled {
 		list.Network = append(list.Network, net.Network_UDP)
@@ -169,7 +172,7 @@ func (s *Server) handleConnection(ctx context.Context, conn internet.Connection,
 		return err
 	}
 
-	responseDone := signal.ExecuteAsync(func() error {
+	responseDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.UplinkOnly)
 
 		bufferedWriter := buf.NewBufferedWriter(buf.NewWriter(conn))
@@ -197,9 +200,9 @@ func (s *Server) handleConnection(ctx context.Context, conn internet.Connection,
 		}
 
 		return nil
-	})
+	}
 
-	requestDone := signal.ExecuteAsync(func() error {
+	requestDone := func() error {
 		defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)
 		defer ray.InboundInput().Close()
 
@@ -208,9 +211,9 @@ func (s *Server) handleConnection(ctx context.Context, conn internet.Connection,
 		}
 
 		return nil
-	})
+	}
 
-	if err := signal.ErrorOrFinish2(ctx, requestDone, responseDone); err != nil {
+	if err := signal.ExecuteParallel(ctx, requestDone, responseDone); err != nil {
 		ray.InboundInput().CloseError()
 		ray.InboundOutput().CloseError()
 		return newError("connection ends").Base(err)

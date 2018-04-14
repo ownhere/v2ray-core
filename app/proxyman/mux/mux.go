@@ -10,8 +10,10 @@ import (
 
 	"v2ray.com/core"
 	"v2ray.com/core/app/proxyman"
+	"v2ray.com/core/common"
 	"v2ray.com/core/common/buf"
 	"v2ray.com/core/common/errors"
+	"v2ray.com/core/common/log"
 	"v2ray.com/core/common/net"
 	"v2ray.com/core/common/protocol"
 	"v2ray.com/core/common/signal"
@@ -131,7 +133,7 @@ func (m *Client) monitor() {
 		case <-timer.C:
 			size := m.sessionManager.Size()
 			if size == 0 && m.sessionManager.CloseIfNoSession() {
-				m.done.Close()
+				common.Must(m.done.Close())
 				return
 			}
 		}
@@ -146,13 +148,15 @@ func fetchInput(ctx context.Context, s *Session, output buf.Writer) {
 	}
 	s.transferType = transferType
 	writer := NewWriter(s.ID, dest, output, transferType)
-	defer writer.Close()
 	defer s.Close()
 
 	newError("dispatching request to ", dest).WithContext(ctx).WriteToLog()
 	if err := buf.Copy(s.input, writer); err != nil {
 		newError("failed to fetch all input").Base(err).WithContext(ctx).WriteToLog()
+		writer.hasError = true
 	}
+
+	writer.Close()
 }
 
 func (m *Client) Dispatch(ctx context.Context, outboundRay ray.OutboundRay) bool {
@@ -199,13 +203,22 @@ func (m *Client) handleStatusKeep(meta *FrameMetadata, reader *buf.BufferedReade
 	}
 
 	if s, found := m.sessionManager.Get(meta.SessionID); found {
-		return buf.Copy(s.NewReader(reader), s.output, buf.IgnoreWriterError())
+		if err := buf.Copy(s.NewReader(reader), s.output); err != nil {
+			drain(reader)
+			s.input.CloseError()
+			return s.Close()
+		}
+		return nil
 	}
 	return drain(reader)
 }
 
 func (m *Client) handleStatusEnd(meta *FrameMetadata, reader *buf.BufferedReader) error {
 	if s, found := m.sessionManager.Get(meta.SessionID); found {
+		if meta.Option.Has(OptionError) {
+			s.input.CloseError()
+			s.output.CloseError()
+		}
 		s.Close()
 	}
 	if meta.Option.Has(OptionData) {
@@ -294,7 +307,9 @@ func handle(ctx context.Context, s *Session, output buf.Writer) {
 	writer := NewResponseWriter(s.ID, output, s.transferType)
 	if err := buf.Copy(s.input, writer); err != nil {
 		newError("session ", s.ID, " ends.").Base(err).WithContext(ctx).WriteToLog()
+		writer.hasError = true
 	}
+
 	writer.Close()
 	s.Close()
 }
@@ -308,6 +323,17 @@ func (w *ServerWorker) handleStatusKeepAlive(meta *FrameMetadata, reader *buf.Bu
 
 func (w *ServerWorker) handleStatusNew(ctx context.Context, meta *FrameMetadata, reader *buf.BufferedReader) error {
 	newError("received request for ", meta.Target).WithContext(ctx).WriteToLog()
+	{
+		msg := &log.AccessMessage{
+			To:     meta.Target,
+			Status: log.AccessAccepted,
+			Reason: "",
+		}
+		if src, f := proxy.SourceFromContext(ctx); f {
+			msg.From = src
+		}
+		log.Record(msg)
+	}
 	inboundRay, err := w.dispatcher.Dispatch(ctx, meta.Target)
 	if err != nil {
 		if meta.Option.Has(OptionData) {
@@ -338,13 +364,22 @@ func (w *ServerWorker) handleStatusKeep(meta *FrameMetadata, reader *buf.Buffere
 		return nil
 	}
 	if s, found := w.sessionManager.Get(meta.SessionID); found {
-		return buf.Copy(s.NewReader(reader), s.output, buf.IgnoreWriterError())
+		if err := buf.Copy(s.NewReader(reader), s.output); err != nil {
+			drain(reader)
+			s.input.CloseError()
+			return s.Close()
+		}
+		return nil
 	}
 	return drain(reader)
 }
 
 func (w *ServerWorker) handleStatusEnd(meta *FrameMetadata, reader *buf.BufferedReader) error {
 	if s, found := w.sessionManager.Get(meta.SessionID); found {
+		if meta.Option.Has(OptionError) {
+			s.input.CloseError()
+			s.output.CloseError()
+		}
 		s.Close()
 	}
 	if meta.Option.Has(OptionData) {

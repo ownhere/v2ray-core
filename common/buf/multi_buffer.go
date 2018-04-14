@@ -6,28 +6,19 @@ import (
 
 	"v2ray.com/core/common"
 	"v2ray.com/core/common/errors"
+	"v2ray.com/core/common/serial"
 )
 
 // ReadAllToMultiBuffer reads all content from the reader into a MultiBuffer, until EOF.
 func ReadAllToMultiBuffer(reader io.Reader) (MultiBuffer, error) {
 	mb := NewMultiBufferCap(128)
 
-	for {
-		b := New()
-		err := b.Reset(ReadFrom(reader))
-		if b.IsEmpty() {
-			b.Release()
-		} else {
-			mb.Append(b)
-		}
-		if err != nil {
-			if errors.Cause(err) == io.EOF {
-				return mb, nil
-			}
-			mb.Release()
-			return nil, err
-		}
+	if _, err := mb.ReadFrom(reader); err != nil {
+		mb.Release()
+		return nil, err
 	}
+
+	return mb, nil
 }
 
 // ReadSizeToMultiBuffer reads specific number of bytes from reader into a MultiBuffer.
@@ -100,8 +91,33 @@ func (mb MultiBuffer) Copy(b []byte) int {
 	return total
 }
 
+// ReadFrom implements io.ReaderFrom.
+func (mb *MultiBuffer) ReadFrom(reader io.Reader) (int64, error) {
+	totalBytes := int64(0)
+
+	for {
+		b := New()
+		err := b.Reset(ReadFrom(reader))
+		if b.IsEmpty() {
+			b.Release()
+		} else {
+			mb.Append(b)
+		}
+		totalBytes += int64(b.Len())
+		if err != nil {
+			if errors.Cause(err) == io.EOF {
+				return totalBytes, nil
+			}
+			return totalBytes, err
+		}
+	}
+}
+
 // Read implements io.Reader.
 func (mb *MultiBuffer) Read(b []byte) (int, error) {
+	if mb.Len() == 0 {
+		return 0, io.EOF
+	}
 	endIndex := len(*mb)
 	totalBytes := 0
 	for i, bb := range *mb {
@@ -120,8 +136,26 @@ func (mb *MultiBuffer) Read(b []byte) (int, error) {
 	return totalBytes, nil
 }
 
+// WriteTo implements io.WriterTo.
+func (mb *MultiBuffer) WriteTo(writer io.Writer) (int64, error) {
+	defer mb.Release()
+
+	totalBytes := int64(0)
+	for _, b := range *mb {
+		nBytes, err := writer.Write(b.Bytes())
+		totalBytes += int64(nBytes)
+		if err != nil {
+			return totalBytes, err
+		}
+	}
+
+	return totalBytes, nil
+}
+
 // Write implements io.Writer.
-func (mb *MultiBuffer) Write(b []byte) {
+func (mb *MultiBuffer) Write(b []byte) (int, error) {
+	totalBytes := len(b)
+
 	n := len(*mb)
 	if n > 0 && !(*mb)[n-1].IsFull() {
 		nBytes, _ := (*mb)[n-1].Write(b)
@@ -134,6 +168,8 @@ func (mb *MultiBuffer) Write(b []byte) {
 		b = b[nBytes:]
 		mb.Append(bb)
 	}
+
+	return totalBytes, nil
 }
 
 // Len returns the total number of bytes in the MultiBuffer.
@@ -162,6 +198,14 @@ func (mb *MultiBuffer) Release() {
 		(*mb)[i] = nil
 	}
 	*mb = nil
+}
+
+func (mb MultiBuffer) String() string {
+	v := make([]interface{}, len(mb))
+	for i, b := range mb {
+		v[i] = b
+	}
+	return serial.Concat(v...)
 }
 
 // ToNetBuffers converts this MultiBuffer to net.Buffers. The return net.Buffers points to the same content of the MultiBuffer.

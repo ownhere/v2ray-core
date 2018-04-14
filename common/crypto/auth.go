@@ -9,44 +9,36 @@ import (
 	"v2ray.com/core/common/protocol"
 )
 
-type BytesGenerator interface {
-	Next() []byte
-}
+type BytesGenerator func() []byte
 
-type NoOpBytesGenerator struct {
-	buffer [1]byte
-}
-
-func (v NoOpBytesGenerator) Next() []byte {
-	return v.buffer[:0]
-}
-
-type StaticBytesGenerator struct {
-	Content []byte
-}
-
-func (v StaticBytesGenerator) Next() []byte {
-	return v.Content
-}
-
-type IncreasingAEADNonceGenerator struct {
-	nonce []byte
-}
-
-func NewIncreasingAEADNonceGenerator() *IncreasingAEADNonceGenerator {
-	return &IncreasingAEADNonceGenerator{
-		nonce: []byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF},
+func GenerateEmptyBytes() BytesGenerator {
+	var b [1]byte
+	return func() []byte {
+		return b[:0]
 	}
 }
 
-func (g *IncreasingAEADNonceGenerator) Next() []byte {
-	for i := range g.nonce {
-		g.nonce[i]++
-		if g.nonce[i] != 0 {
-			break
+func GenerateStaticBytes(content []byte) BytesGenerator {
+	return func() []byte {
+		return content
+	}
+}
+
+func GenerateIncreasingNonce(nonce []byte) BytesGenerator {
+	c := append([]byte(nil), nonce...)
+	return func() []byte {
+		for i := range c {
+			c[i]++
+			if c[i] != 0 {
+				break
+			}
 		}
+		return c
 	}
-	return g.nonce
+}
+
+func GenerateInitialAEADNonce() BytesGenerator {
+	return GenerateIncreasingNonce([]byte{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF})
 }
 
 type Authenticator interface {
@@ -63,27 +55,27 @@ type AEADAuthenticator struct {
 }
 
 func (v *AEADAuthenticator) Open(dst, cipherText []byte) ([]byte, error) {
-	iv := v.NonceGenerator.Next()
+	iv := v.NonceGenerator()
 	if len(iv) != v.AEAD.NonceSize() {
 		return nil, newError("invalid AEAD nonce size: ", len(iv))
 	}
 
 	var additionalData []byte
 	if v.AdditionalDataGenerator != nil {
-		additionalData = v.AdditionalDataGenerator.Next()
+		additionalData = v.AdditionalDataGenerator()
 	}
 	return v.AEAD.Open(dst, iv, cipherText, additionalData)
 }
 
 func (v *AEADAuthenticator) Seal(dst, plainText []byte) ([]byte, error) {
-	iv := v.NonceGenerator.Next()
+	iv := v.NonceGenerator()
 	if len(iv) != v.AEAD.NonceSize() {
 		return nil, newError("invalid AEAD nonce size: ", len(iv))
 	}
 
 	var additionalData []byte
 	if v.AdditionalDataGenerator != nil {
-		additionalData = v.AdditionalDataGenerator.Next()
+		additionalData = v.AdditionalDataGenerator()
 	}
 	return v.AEAD.Seal(dst, iv, plainText, additionalData), nil
 }
@@ -113,8 +105,7 @@ func (r *AuthenticationReader) readSize() (int32, error) {
 		return s, nil
 	}
 	sizeBytes := make([]byte, r.sizeParser.SizeBytes())
-	_, err := io.ReadFull(r.reader, sizeBytes)
-	if err != nil {
+	if _, err := io.ReadFull(r.reader, sizeBytes); err != nil {
 		return 0, err
 	}
 	size, err := r.sizeParser.Decode(sizeBytes)
@@ -124,7 +115,7 @@ func (r *AuthenticationReader) readSize() (int32, error) {
 var errSoft = newError("waiting for more data")
 
 func (r *AuthenticationReader) readInternal(soft bool) (*buf.Buffer, error) {
-	if soft && r.reader.BufferedBytes() < int32(r.sizeParser.SizeBytes()) {
+	if soft && r.reader.BufferedBytes() < r.sizeParser.SizeBytes() {
 		return nil, errSoft
 	}
 
@@ -248,14 +239,6 @@ func (w *AuthenticationWriter) writeStream(mb buf.MultiBuffer) error {
 func (w *AuthenticationWriter) writePacket(mb buf.MultiBuffer) error {
 	defer mb.Release()
 
-	if mb.IsEmpty() {
-		b := buf.New()
-		defer b.Release()
-
-		eb, _ := w.seal(b)
-		return w.writer.WriteMultiBuffer(buf.NewMultiBufferValue(eb))
-	}
-
 	mb2Write := buf.NewMultiBufferCap(int32(len(mb)) + 1)
 
 	for !mb.IsEmpty() {
@@ -276,6 +259,14 @@ func (w *AuthenticationWriter) writePacket(mb buf.MultiBuffer) error {
 }
 
 func (w *AuthenticationWriter) WriteMultiBuffer(mb buf.MultiBuffer) error {
+	if mb.IsEmpty() {
+		b := buf.New()
+		defer b.Release()
+
+		eb, _ := w.seal(b)
+		return w.writer.WriteMultiBuffer(buf.NewMultiBufferValue(eb))
+	}
+
 	if w.transferType == protocol.TransferTypeStream {
 		return w.writeStream(mb)
 	}
