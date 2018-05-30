@@ -91,7 +91,7 @@ type AuthenticationReader struct {
 func NewAuthenticationReader(auth Authenticator, sizeParser ChunkSizeDecoder, reader io.Reader, transferType protocol.TransferType) *AuthenticationReader {
 	return &AuthenticationReader{
 		auth:         auth,
-		reader:       buf.NewBufferedReader(buf.NewReader(reader)),
+		reader:       &buf.BufferedReader{Reader: buf.NewReader(reader)},
 		sizeParser:   sizeParser,
 		transferType: transferType,
 		size:         -1,
@@ -145,7 +145,7 @@ func (r *AuthenticationReader) readInternal(soft bool) (*buf.Buffer, error) {
 		b.Release()
 		return nil, err
 	}
-	b.Slice(0, int32(len(rb)))
+	b.Resize(0, int32(len(rb)))
 
 	return b, nil
 }

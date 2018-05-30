@@ -13,7 +13,7 @@ import (
 	"v2ray.com/core/common/buf"
 	"v2ray.com/core/common/net"
 	"v2ray.com/core/common/session"
-	"v2ray.com/core/common/signal"
+	"v2ray.com/core/common/signal/done"
 	"v2ray.com/core/proxy"
 	"v2ray.com/core/transport/internet"
 	"v2ray.com/core/transport/internet/tcp"
@@ -115,13 +115,46 @@ type udpConn struct {
 	output           func([]byte) (int, error)
 	remote           net.Addr
 	local            net.Addr
-	done             *signal.Done
+	done             *done.Instance
 	uplink           core.StatCounter
 	downlink         core.StatCounter
 }
 
 func (c *udpConn) updateActivity() {
 	atomic.StoreInt64(&c.lastActivityTime, time.Now().Unix())
+}
+
+// ReadMultiBuffer implements buf.Reader
+func (c *udpConn) ReadMultiBuffer() (buf.MultiBuffer, error) {
+	var payload buf.MultiBuffer
+
+	select {
+	case in := <-c.input:
+		payload.Append(in)
+	default:
+		select {
+		case in := <-c.input:
+			payload.Append(in)
+		case <-c.done.Wait():
+			return nil, io.EOF
+		}
+	}
+
+L:
+	for {
+		select {
+		case in := <-c.input:
+			payload.Append(in)
+		default:
+			break L
+		}
+	}
+
+	if c.uplink != nil {
+		c.uplink.Add(int64(payload.Len()))
+	}
+
+	return payload, nil
 }
 
 func (c *udpConn) Read(buf []byte) (int, error) {
@@ -134,7 +167,7 @@ func (c *udpConn) Read(buf []byte) (int, error) {
 			c.uplink.Add(int64(nBytes))
 		}
 		return nBytes, nil
-	case <-c.done.C():
+	case <-c.done.Wait():
 		return 0, io.EOF
 	}
 }
@@ -194,7 +227,7 @@ type udpWorker struct {
 	uplinkCounter   core.StatCounter
 	downlinkCounter core.StatCounter
 
-	done       *signal.Done
+	done       *done.Instance
 	activeConn map[connID]*udpConn
 }
 
@@ -202,7 +235,7 @@ func (w *udpWorker) getConnection(id connID) (*udpConn, bool) {
 	w.Lock()
 	defer w.Unlock()
 
-	if conn, found := w.activeConn[id]; found {
+	if conn, found := w.activeConn[id]; found && !conn.done.Done() {
 		return conn, true
 	}
 
@@ -219,7 +252,7 @@ func (w *udpWorker) getConnection(id connID) (*udpConn, bool) {
 			IP:   w.address.IP(),
 			Port: int(w.port),
 		},
-		done:     signal.NewDone(),
+		done:     done.New(),
 		uplink:   w.uplinkCounter,
 		downlink: w.downlinkCounter,
 	}
@@ -239,7 +272,7 @@ func (w *udpWorker) callback(b *buf.Buffer, source net.Destination, originalDest
 	conn, existing := w.getConnection(id)
 	select {
 	case conn.input <- b:
-	case <-conn.done.C():
+	case <-conn.done.Wait():
 		b.Release()
 	default:
 		b.Release()
@@ -276,7 +309,7 @@ func (w *udpWorker) removeConn(id connID) {
 
 func (w *udpWorker) Start() error {
 	w.activeConn = make(map[connID]*udpConn, 16)
-	w.done = signal.NewDone()
+	w.done = done.New()
 	h, err := udp.ListenUDP(w.address, w.port, w.callback, udp.HubReceiveOriginalDestination(w.recvOrigDest), udp.HubCapacity(256))
 	if err != nil {
 		return err
@@ -308,7 +341,7 @@ func (w *udpWorker) monitor() {
 
 	for {
 		select {
-		case <-w.done.C():
+		case <-w.done.Wait():
 			return
 		case <-timer.C:
 			nowSec := time.Now().Unix()
