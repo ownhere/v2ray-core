@@ -3,6 +3,7 @@ package shadowsocks
 import (
 	"context"
 
+	"v2ray.com/core/common/session"
 	"v2ray.com/core/common/task"
 
 	"v2ray.com/core"
@@ -26,7 +27,11 @@ type Client struct {
 func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 	serverList := protocol.NewServerList()
 	for _, rec := range config.Server {
-		serverList.AddServer(protocol.NewServerSpecFromPB(*rec))
+		s, err := protocol.NewServerSpecFromPB(*rec)
+		if err != nil {
+			return nil, newError("failed to parse server spec").Base(err)
+		}
+		serverList.AddServer(s)
 	}
 	if serverList.Size() == 0 {
 		return nil, newError("0 server")
@@ -40,10 +45,11 @@ func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 
 // Process implements OutboundHandler.Process().
 func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dialer) error {
-	destination, ok := proxy.TargetFromContext(ctx)
-	if !ok {
+	outbound := session.OutboundFromContext(ctx)
+	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified")
 	}
+	destination := outbound.Target
 	network := destination.Network
 
 	var server *protocol.ServerSpec
@@ -64,7 +70,7 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 	if err != nil {
 		return newError("failed to find an available destination").AtWarning().Base(err)
 	}
-	newError("tunneling request to ", destination, " via ", server.Destination()).WithContext(ctx).WriteToLog()
+	newError("tunneling request to ", destination, " via ", server.Destination()).WriteToLog(session.ExportIDToError(ctx))
 
 	defer conn.Close()
 
@@ -80,11 +86,10 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 	}
 
 	user := server.PickUser()
-	rawAccount, err := user.GetTypedAccount()
-	if err != nil {
-		return newError("failed to get a valid user account").AtWarning().Base(err)
+	account, ok := user.Account.(*MemoryAccount)
+	if !ok {
+		return newError("user account is not valid")
 	}
-	account := rawAccount.(*MemoryAccount)
 	request.User = user
 
 	if account.OneTimeAuth == Account_Auto || account.OneTimeAuth == Account_Enabled {
@@ -132,10 +137,10 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 
 	if request.Command == protocol.RequestCommandUDP {
 
-		writer := buf.NewSequentialWriter(&UDPWriter{
+		writer := &buf.SequentialWriter{Writer: &UDPWriter{
 			Writer:  conn,
 			Request: request,
-		})
+		}}
 
 		requestDone := func() error {
 			defer timer.SetTimeout(sessionPolicy.Timeouts.DownlinkOnly)

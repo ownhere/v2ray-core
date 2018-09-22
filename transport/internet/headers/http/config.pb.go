@@ -1,8 +1,10 @@
 package http
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -17,9 +19,9 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Header struct {
 	// "Accept", "Cookie", etc
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Each entry must be valid in one piece. Random entry will be chosen if multiple entries present.
-	Value                []string `protobuf:"bytes,2,rep,name=value" json:"value,omitempty"`
+	Value                []string `protobuf:"bytes,2,rep,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -29,7 +31,7 @@ func (m *Header) Reset()         { *m = Header{} }
 func (m *Header) String() string { return proto.CompactTextString(m) }
 func (*Header) ProtoMessage()    {}
 func (*Header) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{0}
+	return fileDescriptor_e2685d0b4b039e80, []int{0}
 }
 func (m *Header) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Header.Unmarshal(m, b)
@@ -37,8 +39,8 @@ func (m *Header) XXX_Unmarshal(b []byte) error {
 func (m *Header) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Header.Marshal(b, m, deterministic)
 }
-func (dst *Header) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Header.Merge(dst, src)
+func (m *Header) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Header.Merge(m, src)
 }
 func (m *Header) XXX_Size() int {
 	return xxx_messageInfo_Header.Size(m)
@@ -65,7 +67,7 @@ func (m *Header) GetValue() []string {
 
 // HTTP version. Default value "1.1".
 type Version struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -75,7 +77,7 @@ func (m *Version) Reset()         { *m = Version{} }
 func (m *Version) String() string { return proto.CompactTextString(m) }
 func (*Version) ProtoMessage()    {}
 func (*Version) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{1}
+	return fileDescriptor_e2685d0b4b039e80, []int{1}
 }
 func (m *Version) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Version.Unmarshal(m, b)
@@ -83,8 +85,8 @@ func (m *Version) XXX_Unmarshal(b []byte) error {
 func (m *Version) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Version.Marshal(b, m, deterministic)
 }
-func (dst *Version) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Version.Merge(dst, src)
+func (m *Version) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Version.Merge(m, src)
 }
 func (m *Version) XXX_Size() int {
 	return xxx_messageInfo_Version.Size(m)
@@ -104,7 +106,7 @@ func (m *Version) GetValue() string {
 
 // HTTP method. Default value "GET".
 type Method struct {
-	Value                string   `protobuf:"bytes,1,opt,name=value" json:"value,omitempty"`
+	Value                string   `protobuf:"bytes,1,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -114,7 +116,7 @@ func (m *Method) Reset()         { *m = Method{} }
 func (m *Method) String() string { return proto.CompactTextString(m) }
 func (*Method) ProtoMessage()    {}
 func (*Method) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{2}
+	return fileDescriptor_e2685d0b4b039e80, []int{2}
 }
 func (m *Method) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Method.Unmarshal(m, b)
@@ -122,8 +124,8 @@ func (m *Method) XXX_Unmarshal(b []byte) error {
 func (m *Method) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Method.Marshal(b, m, deterministic)
 }
-func (dst *Method) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Method.Merge(dst, src)
+func (m *Method) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Method.Merge(m, src)
 }
 func (m *Method) XXX_Size() int {
 	return xxx_messageInfo_Method.Size(m)
@@ -143,12 +145,12 @@ func (m *Method) GetValue() string {
 
 type RequestConfig struct {
 	// Full HTTP version like "1.1".
-	Version *Version `protobuf:"bytes,1,opt,name=version" json:"version,omitempty"`
+	Version *Version `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
 	// GET, POST, CONNECT etc
-	Method *Method `protobuf:"bytes,2,opt,name=method" json:"method,omitempty"`
+	Method *Method `protobuf:"bytes,2,opt,name=method,proto3" json:"method,omitempty"`
 	// URI like "/login.php"
-	Uri                  []string  `protobuf:"bytes,3,rep,name=uri" json:"uri,omitempty"`
-	Header               []*Header `protobuf:"bytes,4,rep,name=header" json:"header,omitempty"`
+	Uri                  []string  `protobuf:"bytes,3,rep,name=uri,proto3" json:"uri,omitempty"`
+	Header               []*Header `protobuf:"bytes,4,rep,name=header,proto3" json:"header,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -158,7 +160,7 @@ func (m *RequestConfig) Reset()         { *m = RequestConfig{} }
 func (m *RequestConfig) String() string { return proto.CompactTextString(m) }
 func (*RequestConfig) ProtoMessage()    {}
 func (*RequestConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{3}
+	return fileDescriptor_e2685d0b4b039e80, []int{3}
 }
 func (m *RequestConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RequestConfig.Unmarshal(m, b)
@@ -166,8 +168,8 @@ func (m *RequestConfig) XXX_Unmarshal(b []byte) error {
 func (m *RequestConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RequestConfig.Marshal(b, m, deterministic)
 }
-func (dst *RequestConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RequestConfig.Merge(dst, src)
+func (m *RequestConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RequestConfig.Merge(m, src)
 }
 func (m *RequestConfig) XXX_Size() int {
 	return xxx_messageInfo_RequestConfig.Size(m)
@@ -208,9 +210,9 @@ func (m *RequestConfig) GetHeader() []*Header {
 
 type Status struct {
 	// Status code. Default "200".
-	Code string `protobuf:"bytes,1,opt,name=code" json:"code,omitempty"`
+	Code string `protobuf:"bytes,1,opt,name=code,proto3" json:"code,omitempty"`
 	// Statue reason. Default "OK".
-	Reason               string   `protobuf:"bytes,2,opt,name=reason" json:"reason,omitempty"`
+	Reason               string   `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -220,7 +222,7 @@ func (m *Status) Reset()         { *m = Status{} }
 func (m *Status) String() string { return proto.CompactTextString(m) }
 func (*Status) ProtoMessage()    {}
 func (*Status) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{4}
+	return fileDescriptor_e2685d0b4b039e80, []int{4}
 }
 func (m *Status) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Status.Unmarshal(m, b)
@@ -228,8 +230,8 @@ func (m *Status) XXX_Unmarshal(b []byte) error {
 func (m *Status) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Status.Marshal(b, m, deterministic)
 }
-func (dst *Status) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Status.Merge(dst, src)
+func (m *Status) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Status.Merge(m, src)
 }
 func (m *Status) XXX_Size() int {
 	return xxx_messageInfo_Status.Size(m)
@@ -255,9 +257,9 @@ func (m *Status) GetReason() string {
 }
 
 type ResponseConfig struct {
-	Version              *Version  `protobuf:"bytes,1,opt,name=version" json:"version,omitempty"`
-	Status               *Status   `protobuf:"bytes,2,opt,name=status" json:"status,omitempty"`
-	Header               []*Header `protobuf:"bytes,3,rep,name=header" json:"header,omitempty"`
+	Version              *Version  `protobuf:"bytes,1,opt,name=version,proto3" json:"version,omitempty"`
+	Status               *Status   `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Header               []*Header `protobuf:"bytes,3,rep,name=header,proto3" json:"header,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -267,7 +269,7 @@ func (m *ResponseConfig) Reset()         { *m = ResponseConfig{} }
 func (m *ResponseConfig) String() string { return proto.CompactTextString(m) }
 func (*ResponseConfig) ProtoMessage()    {}
 func (*ResponseConfig) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{5}
+	return fileDescriptor_e2685d0b4b039e80, []int{5}
 }
 func (m *ResponseConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ResponseConfig.Unmarshal(m, b)
@@ -275,8 +277,8 @@ func (m *ResponseConfig) XXX_Unmarshal(b []byte) error {
 func (m *ResponseConfig) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_ResponseConfig.Marshal(b, m, deterministic)
 }
-func (dst *ResponseConfig) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ResponseConfig.Merge(dst, src)
+func (m *ResponseConfig) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ResponseConfig.Merge(m, src)
 }
 func (m *ResponseConfig) XXX_Size() int {
 	return xxx_messageInfo_ResponseConfig.Size(m)
@@ -310,9 +312,9 @@ func (m *ResponseConfig) GetHeader() []*Header {
 
 type Config struct {
 	// Settings for authenticating requests. If not set, client side will not send authenication header, and server side will bypass authentication.
-	Request *RequestConfig `protobuf:"bytes,1,opt,name=request" json:"request,omitempty"`
+	Request *RequestConfig `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	// Settings for authenticating responses. If not set, client side will bypass authentication, and server side will not send authentication header.
-	Response             *ResponseConfig `protobuf:"bytes,2,opt,name=response" json:"response,omitempty"`
+	Response             *ResponseConfig `protobuf:"bytes,2,opt,name=response,proto3" json:"response,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -322,7 +324,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_a2d5bfee7e39acaf, []int{6}
+	return fileDescriptor_e2685d0b4b039e80, []int{6}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -330,8 +332,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -367,10 +369,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/transport/internet/headers/http/config.proto", fileDescriptor_config_a2d5bfee7e39acaf)
+	proto.RegisterFile("v2ray.com/core/transport/internet/headers/http/config.proto", fileDescriptor_e2685d0b4b039e80)
 }
 
-var fileDescriptor_config_a2d5bfee7e39acaf = []byte{
+var fileDescriptor_e2685d0b4b039e80 = []byte{
 	// 394 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x94, 0xbf, 0x8a, 0xdb, 0x40,
 	0x10, 0xc6, 0x91, 0xe4, 0xc8, 0xf1, 0x84, 0x84, 0xb0, 0x84, 0xa0, 0x2a, 0x31, 0xaa, 0x8c, 0x8b,

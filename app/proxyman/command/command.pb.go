@@ -1,11 +1,14 @@
 package command
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import core "v2ray.com/core"
-import protocol "v2ray.com/core/common/protocol"
-import serial "v2ray.com/core/common/serial"
+import (
+	fmt "fmt"
+	math "math"
+
+	proto "github.com/golang/protobuf/proto"
+	core "v2ray.com/core"
+	protocol "v2ray.com/core/common/protocol"
+	serial "v2ray.com/core/common/serial"
+)
 
 import (
 	"context"
@@ -25,7 +28,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type AddUserOperation struct {
-	User                 *protocol.User `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
+	User                 *protocol.User `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
 	XXX_sizecache        int32          `json:"-"`
@@ -35,7 +38,7 @@ func (m *AddUserOperation) Reset()         { *m = AddUserOperation{} }
 func (m *AddUserOperation) String() string { return proto.CompactTextString(m) }
 func (*AddUserOperation) ProtoMessage()    {}
 func (*AddUserOperation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{0}
+	return fileDescriptor_e2c30a70a48636a0, []int{0}
 }
 func (m *AddUserOperation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddUserOperation.Unmarshal(m, b)
@@ -43,8 +46,8 @@ func (m *AddUserOperation) XXX_Unmarshal(b []byte) error {
 func (m *AddUserOperation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AddUserOperation.Marshal(b, m, deterministic)
 }
-func (dst *AddUserOperation) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddUserOperation.Merge(dst, src)
+func (m *AddUserOperation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddUserOperation.Merge(m, src)
 }
 func (m *AddUserOperation) XXX_Size() int {
 	return xxx_messageInfo_AddUserOperation.Size(m)
@@ -63,7 +66,7 @@ func (m *AddUserOperation) GetUser() *protocol.User {
 }
 
 type RemoveUserOperation struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
+	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -73,7 +76,7 @@ func (m *RemoveUserOperation) Reset()         { *m = RemoveUserOperation{} }
 func (m *RemoveUserOperation) String() string { return proto.CompactTextString(m) }
 func (*RemoveUserOperation) ProtoMessage()    {}
 func (*RemoveUserOperation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{1}
+	return fileDescriptor_e2c30a70a48636a0, []int{1}
 }
 func (m *RemoveUserOperation) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveUserOperation.Unmarshal(m, b)
@@ -81,8 +84,8 @@ func (m *RemoveUserOperation) XXX_Unmarshal(b []byte) error {
 func (m *RemoveUserOperation) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RemoveUserOperation.Marshal(b, m, deterministic)
 }
-func (dst *RemoveUserOperation) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemoveUserOperation.Merge(dst, src)
+func (m *RemoveUserOperation) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveUserOperation.Merge(m, src)
 }
 func (m *RemoveUserOperation) XXX_Size() int {
 	return xxx_messageInfo_RemoveUserOperation.Size(m)
@@ -101,7 +104,7 @@ func (m *RemoveUserOperation) GetEmail() string {
 }
 
 type AddInboundRequest struct {
-	Inbound              *core.InboundHandlerConfig `protobuf:"bytes,1,opt,name=inbound" json:"inbound,omitempty"`
+	Inbound              *core.InboundHandlerConfig `protobuf:"bytes,1,opt,name=inbound,proto3" json:"inbound,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_unrecognized     []byte                     `json:"-"`
 	XXX_sizecache        int32                      `json:"-"`
@@ -111,7 +114,7 @@ func (m *AddInboundRequest) Reset()         { *m = AddInboundRequest{} }
 func (m *AddInboundRequest) String() string { return proto.CompactTextString(m) }
 func (*AddInboundRequest) ProtoMessage()    {}
 func (*AddInboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{2}
+	return fileDescriptor_e2c30a70a48636a0, []int{2}
 }
 func (m *AddInboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddInboundRequest.Unmarshal(m, b)
@@ -119,8 +122,8 @@ func (m *AddInboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *AddInboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AddInboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *AddInboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddInboundRequest.Merge(dst, src)
+func (m *AddInboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddInboundRequest.Merge(m, src)
 }
 func (m *AddInboundRequest) XXX_Size() int {
 	return xxx_messageInfo_AddInboundRequest.Size(m)
@@ -148,7 +151,7 @@ func (m *AddInboundResponse) Reset()         { *m = AddInboundResponse{} }
 func (m *AddInboundResponse) String() string { return proto.CompactTextString(m) }
 func (*AddInboundResponse) ProtoMessage()    {}
 func (*AddInboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{3}
+	return fileDescriptor_e2c30a70a48636a0, []int{3}
 }
 func (m *AddInboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddInboundResponse.Unmarshal(m, b)
@@ -156,8 +159,8 @@ func (m *AddInboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *AddInboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AddInboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *AddInboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddInboundResponse.Merge(dst, src)
+func (m *AddInboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddInboundResponse.Merge(m, src)
 }
 func (m *AddInboundResponse) XXX_Size() int {
 	return xxx_messageInfo_AddInboundResponse.Size(m)
@@ -169,7 +172,7 @@ func (m *AddInboundResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_AddInboundResponse proto.InternalMessageInfo
 
 type RemoveInboundRequest struct {
-	Tag                  string   `protobuf:"bytes,1,opt,name=tag" json:"tag,omitempty"`
+	Tag                  string   `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -179,7 +182,7 @@ func (m *RemoveInboundRequest) Reset()         { *m = RemoveInboundRequest{} }
 func (m *RemoveInboundRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveInboundRequest) ProtoMessage()    {}
 func (*RemoveInboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{4}
+	return fileDescriptor_e2c30a70a48636a0, []int{4}
 }
 func (m *RemoveInboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveInboundRequest.Unmarshal(m, b)
@@ -187,8 +190,8 @@ func (m *RemoveInboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *RemoveInboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RemoveInboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *RemoveInboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemoveInboundRequest.Merge(dst, src)
+func (m *RemoveInboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveInboundRequest.Merge(m, src)
 }
 func (m *RemoveInboundRequest) XXX_Size() int {
 	return xxx_messageInfo_RemoveInboundRequest.Size(m)
@@ -216,7 +219,7 @@ func (m *RemoveInboundResponse) Reset()         { *m = RemoveInboundResponse{} }
 func (m *RemoveInboundResponse) String() string { return proto.CompactTextString(m) }
 func (*RemoveInboundResponse) ProtoMessage()    {}
 func (*RemoveInboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{5}
+	return fileDescriptor_e2c30a70a48636a0, []int{5}
 }
 func (m *RemoveInboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveInboundResponse.Unmarshal(m, b)
@@ -224,8 +227,8 @@ func (m *RemoveInboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *RemoveInboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RemoveInboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *RemoveInboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemoveInboundResponse.Merge(dst, src)
+func (m *RemoveInboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveInboundResponse.Merge(m, src)
 }
 func (m *RemoveInboundResponse) XXX_Size() int {
 	return xxx_messageInfo_RemoveInboundResponse.Size(m)
@@ -237,8 +240,8 @@ func (m *RemoveInboundResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_RemoveInboundResponse proto.InternalMessageInfo
 
 type AlterInboundRequest struct {
-	Tag                  string               `protobuf:"bytes,1,opt,name=tag" json:"tag,omitempty"`
-	Operation            *serial.TypedMessage `protobuf:"bytes,2,opt,name=operation" json:"operation,omitempty"`
+	Tag                  string               `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
+	Operation            *serial.TypedMessage `protobuf:"bytes,2,opt,name=operation,proto3" json:"operation,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -248,7 +251,7 @@ func (m *AlterInboundRequest) Reset()         { *m = AlterInboundRequest{} }
 func (m *AlterInboundRequest) String() string { return proto.CompactTextString(m) }
 func (*AlterInboundRequest) ProtoMessage()    {}
 func (*AlterInboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{6}
+	return fileDescriptor_e2c30a70a48636a0, []int{6}
 }
 func (m *AlterInboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AlterInboundRequest.Unmarshal(m, b)
@@ -256,8 +259,8 @@ func (m *AlterInboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *AlterInboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AlterInboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *AlterInboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AlterInboundRequest.Merge(dst, src)
+func (m *AlterInboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AlterInboundRequest.Merge(m, src)
 }
 func (m *AlterInboundRequest) XXX_Size() int {
 	return xxx_messageInfo_AlterInboundRequest.Size(m)
@@ -292,7 +295,7 @@ func (m *AlterInboundResponse) Reset()         { *m = AlterInboundResponse{} }
 func (m *AlterInboundResponse) String() string { return proto.CompactTextString(m) }
 func (*AlterInboundResponse) ProtoMessage()    {}
 func (*AlterInboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{7}
+	return fileDescriptor_e2c30a70a48636a0, []int{7}
 }
 func (m *AlterInboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AlterInboundResponse.Unmarshal(m, b)
@@ -300,8 +303,8 @@ func (m *AlterInboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *AlterInboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AlterInboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *AlterInboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AlterInboundResponse.Merge(dst, src)
+func (m *AlterInboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AlterInboundResponse.Merge(m, src)
 }
 func (m *AlterInboundResponse) XXX_Size() int {
 	return xxx_messageInfo_AlterInboundResponse.Size(m)
@@ -313,7 +316,7 @@ func (m *AlterInboundResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_AlterInboundResponse proto.InternalMessageInfo
 
 type AddOutboundRequest struct {
-	Outbound             *core.OutboundHandlerConfig `protobuf:"bytes,1,opt,name=outbound" json:"outbound,omitempty"`
+	Outbound             *core.OutboundHandlerConfig `protobuf:"bytes,1,opt,name=outbound,proto3" json:"outbound,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_unrecognized     []byte                      `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
@@ -323,7 +326,7 @@ func (m *AddOutboundRequest) Reset()         { *m = AddOutboundRequest{} }
 func (m *AddOutboundRequest) String() string { return proto.CompactTextString(m) }
 func (*AddOutboundRequest) ProtoMessage()    {}
 func (*AddOutboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{8}
+	return fileDescriptor_e2c30a70a48636a0, []int{8}
 }
 func (m *AddOutboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddOutboundRequest.Unmarshal(m, b)
@@ -331,8 +334,8 @@ func (m *AddOutboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *AddOutboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AddOutboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *AddOutboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddOutboundRequest.Merge(dst, src)
+func (m *AddOutboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddOutboundRequest.Merge(m, src)
 }
 func (m *AddOutboundRequest) XXX_Size() int {
 	return xxx_messageInfo_AddOutboundRequest.Size(m)
@@ -360,7 +363,7 @@ func (m *AddOutboundResponse) Reset()         { *m = AddOutboundResponse{} }
 func (m *AddOutboundResponse) String() string { return proto.CompactTextString(m) }
 func (*AddOutboundResponse) ProtoMessage()    {}
 func (*AddOutboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{9}
+	return fileDescriptor_e2c30a70a48636a0, []int{9}
 }
 func (m *AddOutboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AddOutboundResponse.Unmarshal(m, b)
@@ -368,8 +371,8 @@ func (m *AddOutboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *AddOutboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AddOutboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *AddOutboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AddOutboundResponse.Merge(dst, src)
+func (m *AddOutboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddOutboundResponse.Merge(m, src)
 }
 func (m *AddOutboundResponse) XXX_Size() int {
 	return xxx_messageInfo_AddOutboundResponse.Size(m)
@@ -381,7 +384,7 @@ func (m *AddOutboundResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_AddOutboundResponse proto.InternalMessageInfo
 
 type RemoveOutboundRequest struct {
-	Tag                  string   `protobuf:"bytes,1,opt,name=tag" json:"tag,omitempty"`
+	Tag                  string   `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -391,7 +394,7 @@ func (m *RemoveOutboundRequest) Reset()         { *m = RemoveOutboundRequest{} }
 func (m *RemoveOutboundRequest) String() string { return proto.CompactTextString(m) }
 func (*RemoveOutboundRequest) ProtoMessage()    {}
 func (*RemoveOutboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{10}
+	return fileDescriptor_e2c30a70a48636a0, []int{10}
 }
 func (m *RemoveOutboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveOutboundRequest.Unmarshal(m, b)
@@ -399,8 +402,8 @@ func (m *RemoveOutboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *RemoveOutboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RemoveOutboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *RemoveOutboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemoveOutboundRequest.Merge(dst, src)
+func (m *RemoveOutboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveOutboundRequest.Merge(m, src)
 }
 func (m *RemoveOutboundRequest) XXX_Size() int {
 	return xxx_messageInfo_RemoveOutboundRequest.Size(m)
@@ -428,7 +431,7 @@ func (m *RemoveOutboundResponse) Reset()         { *m = RemoveOutboundResponse{}
 func (m *RemoveOutboundResponse) String() string { return proto.CompactTextString(m) }
 func (*RemoveOutboundResponse) ProtoMessage()    {}
 func (*RemoveOutboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{11}
+	return fileDescriptor_e2c30a70a48636a0, []int{11}
 }
 func (m *RemoveOutboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RemoveOutboundResponse.Unmarshal(m, b)
@@ -436,8 +439,8 @@ func (m *RemoveOutboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *RemoveOutboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_RemoveOutboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *RemoveOutboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RemoveOutboundResponse.Merge(dst, src)
+func (m *RemoveOutboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveOutboundResponse.Merge(m, src)
 }
 func (m *RemoveOutboundResponse) XXX_Size() int {
 	return xxx_messageInfo_RemoveOutboundResponse.Size(m)
@@ -449,8 +452,8 @@ func (m *RemoveOutboundResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_RemoveOutboundResponse proto.InternalMessageInfo
 
 type AlterOutboundRequest struct {
-	Tag                  string               `protobuf:"bytes,1,opt,name=tag" json:"tag,omitempty"`
-	Operation            *serial.TypedMessage `protobuf:"bytes,2,opt,name=operation" json:"operation,omitempty"`
+	Tag                  string               `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
+	Operation            *serial.TypedMessage `protobuf:"bytes,2,opt,name=operation,proto3" json:"operation,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -460,7 +463,7 @@ func (m *AlterOutboundRequest) Reset()         { *m = AlterOutboundRequest{} }
 func (m *AlterOutboundRequest) String() string { return proto.CompactTextString(m) }
 func (*AlterOutboundRequest) ProtoMessage()    {}
 func (*AlterOutboundRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{12}
+	return fileDescriptor_e2c30a70a48636a0, []int{12}
 }
 func (m *AlterOutboundRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AlterOutboundRequest.Unmarshal(m, b)
@@ -468,8 +471,8 @@ func (m *AlterOutboundRequest) XXX_Unmarshal(b []byte) error {
 func (m *AlterOutboundRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AlterOutboundRequest.Marshal(b, m, deterministic)
 }
-func (dst *AlterOutboundRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AlterOutboundRequest.Merge(dst, src)
+func (m *AlterOutboundRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AlterOutboundRequest.Merge(m, src)
 }
 func (m *AlterOutboundRequest) XXX_Size() int {
 	return xxx_messageInfo_AlterOutboundRequest.Size(m)
@@ -504,7 +507,7 @@ func (m *AlterOutboundResponse) Reset()         { *m = AlterOutboundResponse{} }
 func (m *AlterOutboundResponse) String() string { return proto.CompactTextString(m) }
 func (*AlterOutboundResponse) ProtoMessage()    {}
 func (*AlterOutboundResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{13}
+	return fileDescriptor_e2c30a70a48636a0, []int{13}
 }
 func (m *AlterOutboundResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_AlterOutboundResponse.Unmarshal(m, b)
@@ -512,8 +515,8 @@ func (m *AlterOutboundResponse) XXX_Unmarshal(b []byte) error {
 func (m *AlterOutboundResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_AlterOutboundResponse.Marshal(b, m, deterministic)
 }
-func (dst *AlterOutboundResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AlterOutboundResponse.Merge(dst, src)
+func (m *AlterOutboundResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AlterOutboundResponse.Merge(m, src)
 }
 func (m *AlterOutboundResponse) XXX_Size() int {
 	return xxx_messageInfo_AlterOutboundResponse.Size(m)
@@ -534,7 +537,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_command_9f3931e07157223e, []int{14}
+	return fileDescriptor_e2c30a70a48636a0, []int{14}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -542,8 +545,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -810,10 +813,10 @@ var _HandlerService_serviceDesc = grpc.ServiceDesc{
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/app/proxyman/command/command.proto", fileDescriptor_command_9f3931e07157223e)
+	proto.RegisterFile("v2ray.com/core/app/proxyman/command/command.proto", fileDescriptor_e2c30a70a48636a0)
 }
 
-var fileDescriptor_command_9f3931e07157223e = []byte{
+var fileDescriptor_e2c30a70a48636a0 = []byte{
 	// 557 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x55, 0xdf, 0x6b, 0xd3, 0x40,
 	0x1c, 0xb7, 0x53, 0xbb, 0xed, 0x3b, 0x1d, 0xf3, 0xda, 0x6e, 0x25, 0x3e, 0x6c, 0x46, 0x90, 0x0d,

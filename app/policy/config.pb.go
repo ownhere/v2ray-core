@@ -1,8 +1,10 @@
 package policy
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -16,7 +18,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Second struct {
-	Value                uint32   `protobuf:"varint,1,opt,name=value" json:"value,omitempty"`
+	Value                uint32   `protobuf:"varint,1,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -26,7 +28,7 @@ func (m *Second) Reset()         { *m = Second{} }
 func (m *Second) String() string { return proto.CompactTextString(m) }
 func (*Second) ProtoMessage()    {}
 func (*Second) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{0}
+	return fileDescriptor_48f54a345c1316d1, []int{0}
 }
 func (m *Second) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Second.Unmarshal(m, b)
@@ -34,8 +36,8 @@ func (m *Second) XXX_Unmarshal(b []byte) error {
 func (m *Second) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Second.Marshal(b, m, deterministic)
 }
-func (dst *Second) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Second.Merge(dst, src)
+func (m *Second) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Second.Merge(m, src)
 }
 func (m *Second) XXX_Size() int {
 	return xxx_messageInfo_Second.Size(m)
@@ -54,9 +56,9 @@ func (m *Second) GetValue() uint32 {
 }
 
 type Policy struct {
-	Timeout              *Policy_Timeout `protobuf:"bytes,1,opt,name=timeout" json:"timeout,omitempty"`
-	Stats                *Policy_Stats   `protobuf:"bytes,2,opt,name=stats" json:"stats,omitempty"`
-	Buffer               *Policy_Buffer  `protobuf:"bytes,3,opt,name=buffer" json:"buffer,omitempty"`
+	Timeout              *Policy_Timeout `protobuf:"bytes,1,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	Stats                *Policy_Stats   `protobuf:"bytes,2,opt,name=stats,proto3" json:"stats,omitempty"`
+	Buffer               *Policy_Buffer  `protobuf:"bytes,3,opt,name=buffer,proto3" json:"buffer,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
 	XXX_sizecache        int32           `json:"-"`
@@ -66,7 +68,7 @@ func (m *Policy) Reset()         { *m = Policy{} }
 func (m *Policy) String() string { return proto.CompactTextString(m) }
 func (*Policy) ProtoMessage()    {}
 func (*Policy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{1}
+	return fileDescriptor_48f54a345c1316d1, []int{1}
 }
 func (m *Policy) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Policy.Unmarshal(m, b)
@@ -74,8 +76,8 @@ func (m *Policy) XXX_Unmarshal(b []byte) error {
 func (m *Policy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Policy.Marshal(b, m, deterministic)
 }
-func (dst *Policy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Policy.Merge(dst, src)
+func (m *Policy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Policy.Merge(m, src)
 }
 func (m *Policy) XXX_Size() int {
 	return xxx_messageInfo_Policy.Size(m)
@@ -109,10 +111,10 @@ func (m *Policy) GetBuffer() *Policy_Buffer {
 
 // Timeout is a message for timeout settings in various stages, in seconds.
 type Policy_Timeout struct {
-	Handshake            *Second  `protobuf:"bytes,1,opt,name=handshake" json:"handshake,omitempty"`
-	ConnectionIdle       *Second  `protobuf:"bytes,2,opt,name=connection_idle,json=connectionIdle" json:"connection_idle,omitempty"`
-	UplinkOnly           *Second  `protobuf:"bytes,3,opt,name=uplink_only,json=uplinkOnly" json:"uplink_only,omitempty"`
-	DownlinkOnly         *Second  `protobuf:"bytes,4,opt,name=downlink_only,json=downlinkOnly" json:"downlink_only,omitempty"`
+	Handshake            *Second  `protobuf:"bytes,1,opt,name=handshake,proto3" json:"handshake,omitempty"`
+	ConnectionIdle       *Second  `protobuf:"bytes,2,opt,name=connection_idle,json=connectionIdle,proto3" json:"connection_idle,omitempty"`
+	UplinkOnly           *Second  `protobuf:"bytes,3,opt,name=uplink_only,json=uplinkOnly,proto3" json:"uplink_only,omitempty"`
+	DownlinkOnly         *Second  `protobuf:"bytes,4,opt,name=downlink_only,json=downlinkOnly,proto3" json:"downlink_only,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -122,7 +124,7 @@ func (m *Policy_Timeout) Reset()         { *m = Policy_Timeout{} }
 func (m *Policy_Timeout) String() string { return proto.CompactTextString(m) }
 func (*Policy_Timeout) ProtoMessage()    {}
 func (*Policy_Timeout) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{1, 0}
+	return fileDescriptor_48f54a345c1316d1, []int{1, 0}
 }
 func (m *Policy_Timeout) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Policy_Timeout.Unmarshal(m, b)
@@ -130,8 +132,8 @@ func (m *Policy_Timeout) XXX_Unmarshal(b []byte) error {
 func (m *Policy_Timeout) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Policy_Timeout.Marshal(b, m, deterministic)
 }
-func (dst *Policy_Timeout) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Policy_Timeout.Merge(dst, src)
+func (m *Policy_Timeout) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Policy_Timeout.Merge(m, src)
 }
 func (m *Policy_Timeout) XXX_Size() int {
 	return xxx_messageInfo_Policy_Timeout.Size(m)
@@ -171,8 +173,8 @@ func (m *Policy_Timeout) GetDownlinkOnly() *Second {
 }
 
 type Policy_Stats struct {
-	UserUplink           bool     `protobuf:"varint,1,opt,name=user_uplink,json=userUplink" json:"user_uplink,omitempty"`
-	UserDownlink         bool     `protobuf:"varint,2,opt,name=user_downlink,json=userDownlink" json:"user_downlink,omitempty"`
+	UserUplink           bool     `protobuf:"varint,1,opt,name=user_uplink,json=userUplink,proto3" json:"user_uplink,omitempty"`
+	UserDownlink         bool     `protobuf:"varint,2,opt,name=user_downlink,json=userDownlink,proto3" json:"user_downlink,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -182,7 +184,7 @@ func (m *Policy_Stats) Reset()         { *m = Policy_Stats{} }
 func (m *Policy_Stats) String() string { return proto.CompactTextString(m) }
 func (*Policy_Stats) ProtoMessage()    {}
 func (*Policy_Stats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{1, 1}
+	return fileDescriptor_48f54a345c1316d1, []int{1, 1}
 }
 func (m *Policy_Stats) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Policy_Stats.Unmarshal(m, b)
@@ -190,8 +192,8 @@ func (m *Policy_Stats) XXX_Unmarshal(b []byte) error {
 func (m *Policy_Stats) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Policy_Stats.Marshal(b, m, deterministic)
 }
-func (dst *Policy_Stats) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Policy_Stats.Merge(dst, src)
+func (m *Policy_Stats) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Policy_Stats.Merge(m, src)
 }
 func (m *Policy_Stats) XXX_Size() int {
 	return xxx_messageInfo_Policy_Stats.Size(m)
@@ -218,7 +220,7 @@ func (m *Policy_Stats) GetUserDownlink() bool {
 
 type Policy_Buffer struct {
 	// Buffer size per connection, in bytes. -1 for unlimited buffer.
-	Connection           int32    `protobuf:"varint,1,opt,name=connection" json:"connection,omitempty"`
+	Connection           int32    `protobuf:"varint,1,opt,name=connection,proto3" json:"connection,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -228,7 +230,7 @@ func (m *Policy_Buffer) Reset()         { *m = Policy_Buffer{} }
 func (m *Policy_Buffer) String() string { return proto.CompactTextString(m) }
 func (*Policy_Buffer) ProtoMessage()    {}
 func (*Policy_Buffer) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{1, 2}
+	return fileDescriptor_48f54a345c1316d1, []int{1, 2}
 }
 func (m *Policy_Buffer) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Policy_Buffer.Unmarshal(m, b)
@@ -236,8 +238,8 @@ func (m *Policy_Buffer) XXX_Unmarshal(b []byte) error {
 func (m *Policy_Buffer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Policy_Buffer.Marshal(b, m, deterministic)
 }
-func (dst *Policy_Buffer) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Policy_Buffer.Merge(dst, src)
+func (m *Policy_Buffer) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Policy_Buffer.Merge(m, src)
 }
 func (m *Policy_Buffer) XXX_Size() int {
 	return xxx_messageInfo_Policy_Buffer.Size(m)
@@ -256,7 +258,7 @@ func (m *Policy_Buffer) GetConnection() int32 {
 }
 
 type SystemPolicy struct {
-	Stats                *SystemPolicy_Stats `protobuf:"bytes,1,opt,name=stats" json:"stats,omitempty"`
+	Stats                *SystemPolicy_Stats `protobuf:"bytes,1,opt,name=stats,proto3" json:"stats,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
 	XXX_unrecognized     []byte              `json:"-"`
 	XXX_sizecache        int32               `json:"-"`
@@ -266,7 +268,7 @@ func (m *SystemPolicy) Reset()         { *m = SystemPolicy{} }
 func (m *SystemPolicy) String() string { return proto.CompactTextString(m) }
 func (*SystemPolicy) ProtoMessage()    {}
 func (*SystemPolicy) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{2}
+	return fileDescriptor_48f54a345c1316d1, []int{2}
 }
 func (m *SystemPolicy) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SystemPolicy.Unmarshal(m, b)
@@ -274,8 +276,8 @@ func (m *SystemPolicy) XXX_Unmarshal(b []byte) error {
 func (m *SystemPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SystemPolicy.Marshal(b, m, deterministic)
 }
-func (dst *SystemPolicy) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SystemPolicy.Merge(dst, src)
+func (m *SystemPolicy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SystemPolicy.Merge(m, src)
 }
 func (m *SystemPolicy) XXX_Size() int {
 	return xxx_messageInfo_SystemPolicy.Size(m)
@@ -294,8 +296,8 @@ func (m *SystemPolicy) GetStats() *SystemPolicy_Stats {
 }
 
 type SystemPolicy_Stats struct {
-	InboundUplink        bool     `protobuf:"varint,1,opt,name=inbound_uplink,json=inboundUplink" json:"inbound_uplink,omitempty"`
-	InboundDownlink      bool     `protobuf:"varint,2,opt,name=inbound_downlink,json=inboundDownlink" json:"inbound_downlink,omitempty"`
+	InboundUplink        bool     `protobuf:"varint,1,opt,name=inbound_uplink,json=inboundUplink,proto3" json:"inbound_uplink,omitempty"`
+	InboundDownlink      bool     `protobuf:"varint,2,opt,name=inbound_downlink,json=inboundDownlink,proto3" json:"inbound_downlink,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -305,7 +307,7 @@ func (m *SystemPolicy_Stats) Reset()         { *m = SystemPolicy_Stats{} }
 func (m *SystemPolicy_Stats) String() string { return proto.CompactTextString(m) }
 func (*SystemPolicy_Stats) ProtoMessage()    {}
 func (*SystemPolicy_Stats) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{2, 0}
+	return fileDescriptor_48f54a345c1316d1, []int{2, 0}
 }
 func (m *SystemPolicy_Stats) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SystemPolicy_Stats.Unmarshal(m, b)
@@ -313,8 +315,8 @@ func (m *SystemPolicy_Stats) XXX_Unmarshal(b []byte) error {
 func (m *SystemPolicy_Stats) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_SystemPolicy_Stats.Marshal(b, m, deterministic)
 }
-func (dst *SystemPolicy_Stats) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SystemPolicy_Stats.Merge(dst, src)
+func (m *SystemPolicy_Stats) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SystemPolicy_Stats.Merge(m, src)
 }
 func (m *SystemPolicy_Stats) XXX_Size() int {
 	return xxx_messageInfo_SystemPolicy_Stats.Size(m)
@@ -340,8 +342,8 @@ func (m *SystemPolicy_Stats) GetInboundDownlink() bool {
 }
 
 type Config struct {
-	Level                map[uint32]*Policy `protobuf:"bytes,1,rep,name=level" json:"level,omitempty" protobuf_key:"varint,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	System               *SystemPolicy      `protobuf:"bytes,2,opt,name=system" json:"system,omitempty"`
+	Level                map[uint32]*Policy `protobuf:"bytes,1,rep,name=level,proto3" json:"level,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	System               *SystemPolicy      `protobuf:"bytes,2,opt,name=system,proto3" json:"system,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
 	XXX_sizecache        int32              `json:"-"`
@@ -351,7 +353,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_700aba7c9186c0c0, []int{3}
+	return fileDescriptor_48f54a345c1316d1, []int{3}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -359,8 +361,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -398,10 +400,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/app/policy/config.proto", fileDescriptor_config_700aba7c9186c0c0)
+	proto.RegisterFile("v2ray.com/core/app/policy/config.proto", fileDescriptor_48f54a345c1316d1)
 }
 
-var fileDescriptor_config_700aba7c9186c0c0 = []byte{
+var fileDescriptor_48f54a345c1316d1 = []byte{
 	// 513 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x94, 0xdb, 0x6a, 0x13, 0x41,
 	0x1c, 0xc6, 0xd9, 0xa4, 0xbb, 0xad, 0xff, 0x24, 0x6d, 0x19, 0x2c, 0xc4, 0x05, 0x6b, 0x49, 0xad,

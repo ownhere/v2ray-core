@@ -1,9 +1,11 @@
 package tcp
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import serial "v2ray.com/core/common/serial"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+	serial "v2ray.com/core/common/serial"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -17,7 +19,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Config struct {
-	HeaderSettings       *serial.TypedMessage `protobuf:"bytes,2,opt,name=header_settings,json=headerSettings" json:"header_settings,omitempty"`
+	HeaderSettings       *serial.TypedMessage `protobuf:"bytes,2,opt,name=header_settings,json=headerSettings,proto3" json:"header_settings,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
 	XXX_sizecache        int32                `json:"-"`
@@ -27,7 +29,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_61f4b2c61d528fb0, []int{0}
+	return fileDescriptor_eb6d289fc61edd40, []int{0}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -35,8 +37,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -59,10 +61,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/transport/internet/tcp/config.proto", fileDescriptor_config_61f4b2c61d528fb0)
+	proto.RegisterFile("v2ray.com/core/transport/internet/tcp/config.proto", fileDescriptor_eb6d289fc61edd40)
 }
 
-var fileDescriptor_config_61f4b2c61d528fb0 = []byte{
+var fileDescriptor_eb6d289fc61edd40 = []byte{
 	// 223 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x8e, 0xc1, 0x4a, 0xc4, 0x30,
 	0x10, 0x86, 0x69, 0x95, 0x45, 0x2a, 0xa8, 0xec, 0x49, 0x3c, 0xb9, 0x82, 0xe2, 0x69, 0x22, 0xf1,

@@ -3,6 +3,7 @@ Please skip to the English section below if you don't write Chinese.
 中文：
 提交 Issue 之前请先阅读 [Issue 指引](https://github.com/v2ray/v2ray-core/blob/master/.github/SUPPORT.md)，然后回答下面的问题，谢谢。
 除非特殊情况，请完整填写所有问题。不按模板发的 issue 将直接被关闭。
+如果你遇到的问题不是 V2Ray 的 bug，比如你不清楚要如何配置，请使用[Discussion](https://github.com/v2ray/discussion/issues)进行讨论。
 
 1)  你正在使用哪个版本的 V2Ray？（如果服务器和客户端使用了不同版本，请注明）
 
@@ -13,25 +14,25 @@ Please skip to the English section below if you don't write Chinese.
 4)  你期待看到的正确表现是怎样的？
 
 5)  请附上你的配置（提交 Issue 前请隐藏服务器端IP地址）。
-    
-    服务器端配置:
+
+服务器端配置:
 ```javascript
     // 在这里附上服务器端配置文件
 ```
 
-    客户端配置:
+客户端配置:
 ```javascript
     // 在这里附上客户端配置
 ```
 
 6)  请附上出错时软件输出的错误日志。在 Linux 中，日志通常在 `/var/log/v2ray/error.log` 文件中。
 
-    服务器端错误日志:
+服务器端错误日志:
 ```
     // 在这里附上服务器端日志
 ```
 
-    客户端错误日志:
+客户端错误日志:
 ```
     // 在这里附上客户端日志
 ```
@@ -59,6 +60,7 @@ Please remove the Chinese section above.
 English:
 Please read the [instruction](https://github.com/v2ray/v2ray-core/blob/master/.github/SUPPORT.md) and answer the following questions before submitting your issue. Thank you.
 Please answer all the questions with enough information. All issues not following this template will be closed immediately.
+If you are not sure if your question is truely a bug in V2Ray, please discuss it [here](https://github.com/v2ray/discussion/issues) first.
 
 1) What version of V2Ray are you using (If you deploy different version on server and client, please explicitly point out)?
 
@@ -70,23 +72,24 @@ Please answer all the questions with enough information. All issues not followin
 
 5) Please attach your configuration file (**Mask IP addresses before submit this issue**).
 
-    Server configuration:
+Server configuration:
 ```javascript
     // Please attach your server configuration here.
 ```
 
-    Client configuration:
+Client configuration:
 ```javascript
     // Please attach your client configuration here.
 ```
 
 6) Please attach error logs, especially the bottom lines if the file is large. Error log file is usually at `/var/log/v2ray/error.log` on Linux.
 
-    Server error log:
+Server error log:
 ```
     // Please attach your server error log here.
 ```
-    Client error log:
+
+Client error log:
 ```
     // Please attach your client error log here.
 ```

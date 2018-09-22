@@ -1,9 +1,11 @@
 package dokodemo
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import net "v2ray.com/core/common/net"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+	net "v2ray.com/core/common/net"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -17,12 +19,12 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type Config struct {
-	Address              *net.IPOrDomain  `protobuf:"bytes,1,opt,name=address" json:"address,omitempty"`
-	Port                 uint32           `protobuf:"varint,2,opt,name=port" json:"port,omitempty"`
-	NetworkList          *net.NetworkList `protobuf:"bytes,3,opt,name=network_list,json=networkList" json:"network_list,omitempty"`
-	Timeout              uint32           `protobuf:"varint,4,opt,name=timeout" json:"timeout,omitempty"` // Deprecated: Do not use.
-	FollowRedirect       bool             `protobuf:"varint,5,opt,name=follow_redirect,json=followRedirect" json:"follow_redirect,omitempty"`
-	UserLevel            uint32           `protobuf:"varint,6,opt,name=user_level,json=userLevel" json:"user_level,omitempty"`
+	Address              *net.IPOrDomain  `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
+	Port                 uint32           `protobuf:"varint,2,opt,name=port,proto3" json:"port,omitempty"`
+	NetworkList          *net.NetworkList `protobuf:"bytes,3,opt,name=network_list,json=networkList,proto3" json:"network_list,omitempty"`
+	Timeout              uint32           `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"` // Deprecated: Do not use.
+	FollowRedirect       bool             `protobuf:"varint,5,opt,name=follow_redirect,json=followRedirect,proto3" json:"follow_redirect,omitempty"`
+	UserLevel            uint32           `protobuf:"varint,6,opt,name=user_level,json=userLevel,proto3" json:"user_level,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
 	XXX_sizecache        int32            `json:"-"`
@@ -32,7 +34,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_3c1cd7fe1501fc6c, []int{0}
+	return fileDescriptor_de04411d7254f312, []int{0}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -40,8 +42,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -100,10 +102,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/proxy/dokodemo/config.proto", fileDescriptor_config_3c1cd7fe1501fc6c)
+	proto.RegisterFile("v2ray.com/core/proxy/dokodemo/config.proto", fileDescriptor_de04411d7254f312)
 }
 
-var fileDescriptor_config_3c1cd7fe1501fc6c = []byte{
+var fileDescriptor_de04411d7254f312 = []byte{
 	// 310 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x90, 0xcf, 0x4e, 0xc2, 0x40,
 	0x10, 0x87, 0xd3, 0x8a, 0x80, 0x8b, 0x7f, 0x92, 0x3d, 0x2d, 0x46, 0x12, 0xe4, 0x02, 0xf1, 0xb0,

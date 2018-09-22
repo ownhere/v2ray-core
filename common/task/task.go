@@ -2,37 +2,50 @@ package task
 
 import (
 	"context"
+	"strings"
 
+	"v2ray.com/core/common"
 	"v2ray.com/core/common/signal/semaphore"
 )
 
 type Task func() error
 
+type MultiError []error
+
+func (e MultiError) Error() string {
+	var r strings.Builder
+	common.Must2(r.WriteString("multierr: "))
+	for _, err := range e {
+		common.Must2(r.WriteString(err.Error()))
+		common.Must2(r.WriteString(" | "))
+	}
+	return r.String()
+}
+
 type executionContext struct {
 	ctx       context.Context
-	task      Task
+	tasks     []Task
 	onSuccess Task
 	onFailure Task
 }
 
 func (c *executionContext) executeTask() error {
-	if c.ctx == nil && c.task == nil {
+	if len(c.tasks) == 0 {
 		return nil
 	}
 
-	if c.ctx == nil {
-		return c.task()
+	// Reuse current goroutine if we only have one task to run.
+	if len(c.tasks) == 1 && c.ctx == nil {
+		return c.tasks[0]()
 	}
 
-	if c.task == nil {
-		<-c.ctx.Done()
-		return c.ctx.Err()
+	ctx := context.Background()
+
+	if c.ctx != nil {
+		ctx = c.ctx
 	}
 
-	return executeParallel(func() error {
-		<-c.ctx.Done()
-		return c.ctx.Err()
-	}, c.task)
+	return executeParallel(ctx, c.tasks)
 }
 
 func (c *executionContext) run() error {
@@ -56,16 +69,47 @@ func WithContext(ctx context.Context) ExecutionOption {
 
 func Parallel(tasks ...Task) ExecutionOption {
 	return func(c *executionContext) {
-		c.task = func() error {
-			return executeParallel(tasks...)
+		c.tasks = append(c.tasks, tasks...)
+	}
+}
+
+// Sequential runs all tasks sequentially, and returns the first error encountered.Sequential
+// Once a task returns an error, the following tasks will not run.
+func Sequential(tasks ...Task) ExecutionOption {
+	return func(c *executionContext) {
+		switch len(tasks) {
+		case 0:
+			return
+		case 1:
+			c.tasks = append(c.tasks, tasks[0])
+		default:
+			c.tasks = append(c.tasks, func() error {
+				return execute(tasks...)
+			})
 		}
 	}
 }
 
-func Sequential(tasks ...Task) ExecutionOption {
+func SequentialAll(tasks ...Task) ExecutionOption {
 	return func(c *executionContext) {
-		c.task = func() error {
-			return execute(tasks...)
+		switch len(tasks) {
+		case 0:
+			return
+		case 1:
+			c.tasks = append(c.tasks, tasks[0])
+		default:
+			c.tasks = append(c.tasks, func() error {
+				var merr MultiError
+				for _, task := range tasks {
+					if err := task(); err != nil {
+						merr = append(merr, err)
+					}
+				}
+				if len(merr) == 0 {
+					return nil
+				}
+				return merr
+			})
 		}
 	}
 }
@@ -82,8 +126,8 @@ func OnFailure(task Task) ExecutionOption {
 	}
 }
 
-func Single(task Task, opts ExecutionOption) Task {
-	return Run(append([]ExecutionOption{Sequential(task)}, opts)...)
+func Single(task Task, opts ...ExecutionOption) Task {
+	return Run(append([]ExecutionOption{Sequential(task)}, opts...)...)
 }
 
 func Run(opts ...ExecutionOption) Task {
@@ -107,21 +151,24 @@ func execute(tasks ...Task) error {
 }
 
 // executeParallel executes a list of tasks asynchronously, returns the first error encountered or nil if all tasks pass.
-func executeParallel(tasks ...Task) error {
+func executeParallel(ctx context.Context, tasks []Task) error {
 	n := len(tasks)
 	s := semaphore.New(n)
 	done := make(chan error, 1)
 
 	for _, task := range tasks {
 		<-s.Wait()
-		go func(f func() error) {
-			if err := f(); err != nil {
-				select {
-				case done <- err:
-				default:
-				}
+		go func(f Task) {
+			err := f()
+			if err == nil {
+				s.Signal()
+				return
 			}
-			s.Signal()
+
+			select {
+			case done <- err:
+			default:
+			}
 		}(task)
 	}
 
@@ -129,6 +176,8 @@ func executeParallel(tasks ...Task) error {
 		select {
 		case err := <-done:
 			return err
+		case <-ctx.Done():
+			return ctx.Err()
 		case <-s.Wait():
 		}
 	}

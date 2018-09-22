@@ -1,9 +1,11 @@
 package freedom
 
-import proto "github.com/golang/protobuf/proto"
-import fmt "fmt"
-import math "math"
-import protocol "v2ray.com/core/common/protocol"
+import (
+	fmt "fmt"
+	proto "github.com/golang/protobuf/proto"
+	math "math"
+	protocol "v2ray.com/core/common/protocol"
+)
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -27,6 +29,7 @@ var Config_DomainStrategy_name = map[int32]string{
 	0: "AS_IS",
 	1: "USE_IP",
 }
+
 var Config_DomainStrategy_value = map[string]int32{
 	"AS_IS":  0,
 	"USE_IP": 1,
@@ -35,12 +38,13 @@ var Config_DomainStrategy_value = map[string]int32{
 func (x Config_DomainStrategy) String() string {
 	return proto.EnumName(Config_DomainStrategy_name, int32(x))
 }
+
 func (Config_DomainStrategy) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_config_9714d01f3d402353, []int{1, 0}
+	return fileDescriptor_66807b6fe2cca4da, []int{1, 0}
 }
 
 type DestinationOverride struct {
-	Server               *protocol.ServerEndpoint `protobuf:"bytes,1,opt,name=server" json:"server,omitempty"`
+	Server               *protocol.ServerEndpoint `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
 	XXX_unrecognized     []byte                   `json:"-"`
 	XXX_sizecache        int32                    `json:"-"`
@@ -50,7 +54,7 @@ func (m *DestinationOverride) Reset()         { *m = DestinationOverride{} }
 func (m *DestinationOverride) String() string { return proto.CompactTextString(m) }
 func (*DestinationOverride) ProtoMessage()    {}
 func (*DestinationOverride) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_9714d01f3d402353, []int{0}
+	return fileDescriptor_66807b6fe2cca4da, []int{0}
 }
 func (m *DestinationOverride) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DestinationOverride.Unmarshal(m, b)
@@ -58,8 +62,8 @@ func (m *DestinationOverride) XXX_Unmarshal(b []byte) error {
 func (m *DestinationOverride) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_DestinationOverride.Marshal(b, m, deterministic)
 }
-func (dst *DestinationOverride) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_DestinationOverride.Merge(dst, src)
+func (m *DestinationOverride) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DestinationOverride.Merge(m, src)
 }
 func (m *DestinationOverride) XXX_Size() int {
 	return xxx_messageInfo_DestinationOverride.Size(m)
@@ -78,10 +82,10 @@ func (m *DestinationOverride) GetServer() *protocol.ServerEndpoint {
 }
 
 type Config struct {
-	DomainStrategy       Config_DomainStrategy `protobuf:"varint,1,opt,name=domain_strategy,json=domainStrategy,enum=v2ray.core.proxy.freedom.Config_DomainStrategy" json:"domain_strategy,omitempty"`
-	Timeout              uint32                `protobuf:"varint,2,opt,name=timeout" json:"timeout,omitempty"` // Deprecated: Do not use.
-	DestinationOverride  *DestinationOverride  `protobuf:"bytes,3,opt,name=destination_override,json=destinationOverride" json:"destination_override,omitempty"`
-	UserLevel            uint32                `protobuf:"varint,4,opt,name=user_level,json=userLevel" json:"user_level,omitempty"`
+	DomainStrategy       Config_DomainStrategy `protobuf:"varint,1,opt,name=domain_strategy,json=domainStrategy,proto3,enum=v2ray.core.proxy.freedom.Config_DomainStrategy" json:"domain_strategy,omitempty"`
+	Timeout              uint32                `protobuf:"varint,2,opt,name=timeout,proto3" json:"timeout,omitempty"` // Deprecated: Do not use.
+	DestinationOverride  *DestinationOverride  `protobuf:"bytes,3,opt,name=destination_override,json=destinationOverride,proto3" json:"destination_override,omitempty"`
+	UserLevel            uint32                `protobuf:"varint,4,opt,name=user_level,json=userLevel,proto3" json:"user_level,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}              `json:"-"`
 	XXX_unrecognized     []byte                `json:"-"`
 	XXX_sizecache        int32                 `json:"-"`
@@ -91,7 +95,7 @@ func (m *Config) Reset()         { *m = Config{} }
 func (m *Config) String() string { return proto.CompactTextString(m) }
 func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
-	return fileDescriptor_config_9714d01f3d402353, []int{1}
+	return fileDescriptor_66807b6fe2cca4da, []int{1}
 }
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
@@ -99,8 +103,8 @@ func (m *Config) XXX_Unmarshal(b []byte) error {
 func (m *Config) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	return xxx_messageInfo_Config.Marshal(b, m, deterministic)
 }
-func (dst *Config) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_Config.Merge(dst, src)
+func (m *Config) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Config.Merge(m, src)
 }
 func (m *Config) XXX_Size() int {
 	return xxx_messageInfo_Config.Size(m)
@@ -147,10 +151,10 @@ func init() {
 }
 
 func init() {
-	proto.RegisterFile("v2ray.com/core/proxy/freedom/config.proto", fileDescriptor_config_9714d01f3d402353)
+	proto.RegisterFile("v2ray.com/core/proxy/freedom/config.proto", fileDescriptor_66807b6fe2cca4da)
 }
 
-var fileDescriptor_config_9714d01f3d402353 = []byte{
+var fileDescriptor_66807b6fe2cca4da = []byte{
 	// 340 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x74, 0x91, 0x6f, 0x4b, 0x83, 0x50,
 	0x14, 0xc6, 0xd3, 0xca, 0xb1, 0x13, 0xad, 0xe1, 0x7a, 0x21, 0xb1, 0x60, 0xec, 0x4d, 0x2b, 0xe8,

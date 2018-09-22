@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"v2ray.com/core/common/session"
 	"v2ray.com/core/common/task"
 
 	"v2ray.com/core"
@@ -27,7 +28,11 @@ type Client struct {
 func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 	serverList := protocol.NewServerList()
 	for _, rec := range config.Server {
-		serverList.AddServer(protocol.NewServerSpecFromPB(*rec))
+		s, err := protocol.NewServerSpecFromPB(*rec)
+		if err != nil {
+			return nil, newError("failed to get server spec").Base(err)
+		}
+		serverList.AddServer(s)
 	}
 	if serverList.Size() == 0 {
 		return nil, newError("0 target server")
@@ -42,10 +47,11 @@ func NewClient(ctx context.Context, config *ClientConfig) (*Client, error) {
 
 // Process implements proxy.Outbound.Process.
 func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dialer) error {
-	destination, ok := proxy.TargetFromContext(ctx)
-	if !ok {
+	outbound := session.OutboundFromContext(ctx)
+	if outbound == nil || !outbound.Target.IsValid() {
 		return newError("target not specified.")
 	}
+	destination := outbound.Target
 
 	var server *protocol.ServerSpec
 	var conn internet.Connection
@@ -66,7 +72,7 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 
 	defer func() {
 		if err := conn.Close(); err != nil {
-			newError("failed to closed connection").Base(err).WithContext(ctx).WriteToLog()
+			newError("failed to closed connection").Base(err).WriteToLog(session.ExportIDToError(ctx))
 		}
 	}()
 
@@ -89,7 +95,7 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 	}
 
 	if err := conn.SetDeadline(time.Now().Add(p.Timeouts.Handshake)); err != nil {
-		newError("failed to set deadline for handshake").Base(err).WithContext(ctx).WriteToLog()
+		newError("failed to set deadline for handshake").Base(err).WriteToLog(session.ExportIDToError(ctx))
 	}
 	udpRequest, err := ClientHandshake(request, conn, conn)
 	if err != nil {
@@ -97,7 +103,7 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 	}
 
 	if err := conn.SetDeadline(time.Time{}); err != nil {
-		newError("failed to clear deadline after handshake").Base(err).WithContext(ctx).WriteToLog()
+		newError("failed to clear deadline after handshake").Base(err).WriteToLog(session.ExportIDToError(ctx))
 	}
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -122,7 +128,7 @@ func (c *Client) Process(ctx context.Context, link *core.Link, dialer proxy.Dial
 		defer udpConn.Close() // nolint: errcheck
 		requestFunc = func() error {
 			defer timer.SetTimeout(p.Timeouts.DownlinkOnly)
-			return buf.Copy(link.Reader, buf.NewSequentialWriter(NewUDPWriter(request, udpConn)), buf.UpdateActivity(timer))
+			return buf.Copy(link.Reader, &buf.SequentialWriter{Writer: NewUDPWriter(request, udpConn)}, buf.UpdateActivity(timer))
 		}
 		responseFunc = func() error {
 			defer timer.SetTimeout(p.Timeouts.UplinkOnly)

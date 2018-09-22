@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"runtime"
 	"sync"
 	"time"
 
@@ -35,6 +36,7 @@ type BufferPolicy struct {
 	PerConnection int32
 }
 
+// SystemStatsPolicy contains stat policy settings on system level.
 type SystemStatsPolicy struct {
 	// Whether or not to enable stat counter for uplink traffic in inbound handlers.
 	InboundUplink bool
@@ -42,6 +44,7 @@ type SystemStatsPolicy struct {
 	InboundDownlink bool
 }
 
+// SystemPolicy contains policy settings at system level.
 type SystemPolicy struct {
 	Stats  SystemStatsPolicy
 	Buffer BufferPolicy
@@ -65,17 +68,27 @@ type PolicyManager interface {
 	ForSystem() SystemPolicy
 }
 
-var defaultBufferSize int32 = 10 * 1024 * 1024
+var defaultBufferSize int32
 
 func init() {
 	const key = "v2ray.ray.buffer.size"
+	const defaultValue = -17
 	size := platform.EnvFlag{
 		Name:    key,
 		AltName: platform.NormalizeEnvName(key),
-	}.GetValueAsInt(10)
-	if size == 0 {
-		defaultBufferSize = -1
-	} else {
+	}.GetValueAsInt(defaultValue)
+
+	switch size {
+	case 0:
+		defaultBufferSize = -1 // For pipe to use unlimited size
+	case defaultValue: // Env flag not defined. Use default values per CPU-arch.
+		switch runtime.GOARCH {
+		case "arm", "arm64", "mips", "mipsle", "mips64", "mips64le":
+			defaultBufferSize = 16 * 1024 // 16k cache for low-end devices
+		default:
+			defaultBufferSize = 2 * 1024 * 1024
+		}
+	default:
 		defaultBufferSize = int32(size) * 1024 * 1024
 	}
 }
@@ -178,6 +191,6 @@ func (m *syncPolicyManager) Set(manager PolicyManager) {
 	m.Lock()
 	defer m.Unlock()
 
-	common.Close(m.PolicyManager)
+	common.Close(m.PolicyManager) // nolint: errcheck
 	m.PolicyManager = manager
 }
