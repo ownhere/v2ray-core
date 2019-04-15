@@ -15,7 +15,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type SecurityType int32
 
@@ -67,6 +67,7 @@ func (*SecurityConfig) ProtoMessage()    {}
 func (*SecurityConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5931f958a3c1d408, []int{0}
 }
+
 func (m *SecurityConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SecurityConfig.Unmarshal(m, b)
 }
@@ -93,8 +94,8 @@ func (m *SecurityConfig) GetType() SecurityType {
 }
 
 func init() {
-	proto.RegisterType((*SecurityConfig)(nil), "v2ray.core.common.protocol.SecurityConfig")
 	proto.RegisterEnum("v2ray.core.common.protocol.SecurityType", SecurityType_name, SecurityType_value)
+	proto.RegisterType((*SecurityConfig)(nil), "v2ray.core.common.protocol.SecurityConfig")
 }
 
 func init() {

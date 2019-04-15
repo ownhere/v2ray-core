@@ -11,7 +11,7 @@ import (
 	"bytes"
 )
 
-//go:generate go run $GOPATH/src/v2ray.com/core/common/errors/errorgen/main.go -pkg ctlcmd -path Command,Platform,CtlCmd
+//go:generate errorgen
 
 func Run(args []string, input io.Reader) (buf.MultiBuffer, error) {
 	pbConfig, err := serial.LoadJSONConfig(input)
@@ -30,5 +30,5 @@ func Run(args []string, input io.Reader) (buf.MultiBuffer, error) {
 
 	outBuffer, err := buf.ReadAllToMultiBuffer(stdoutReader)
 
-	return outBuffer, nil
+	return outBuffer.MultiBuffer, nil
 }

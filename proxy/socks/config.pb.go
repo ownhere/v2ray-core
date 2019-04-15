@@ -17,12 +17,15 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// AuthType is the authentication type of Socks proxy.
 type AuthType int32
 
 const (
-	AuthType_NO_AUTH  AuthType = 0
+	// NO_AUTH is for anounymous authentication.
+	AuthType_NO_AUTH AuthType = 0
+	// PASSWORD is for username/password authentication.
 	AuthType_PASSWORD AuthType = 1
 )
 
@@ -44,6 +47,7 @@ func (AuthType) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_e86958e2cebd3303, []int{0}
 }
 
+// Account represents a Socks account.
 type Account struct {
 	Username             string   `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	Password             string   `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
@@ -58,6 +62,7 @@ func (*Account) ProtoMessage()    {}
 func (*Account) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e86958e2cebd3303, []int{0}
 }
+
 func (m *Account) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Account.Unmarshal(m, b)
 }
@@ -90,6 +95,7 @@ func (m *Account) GetPassword() string {
 	return ""
 }
 
+// ServerConfig is the protobuf config for Socks server.
 type ServerConfig struct {
 	AuthType             AuthType          `protobuf:"varint,1,opt,name=auth_type,json=authType,proto3,enum=v2ray.core.proxy.socks.AuthType" json:"auth_type,omitempty"`
 	Accounts             map[string]string `protobuf:"bytes,2,rep,name=accounts,proto3" json:"accounts,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
@@ -108,6 +114,7 @@ func (*ServerConfig) ProtoMessage()    {}
 func (*ServerConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e86958e2cebd3303, []int{1}
 }
+
 func (m *ServerConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServerConfig.Unmarshal(m, b)
 }
@@ -169,7 +176,9 @@ func (m *ServerConfig) GetUserLevel() uint32 {
 	return 0
 }
 
+// ClientConfig is the protobuf config for Socks client.
 type ClientConfig struct {
+	// Sever is a list of Socks server addresses.
 	Server               []*protocol.ServerEndpoint `protobuf:"bytes,1,rep,name=server,proto3" json:"server,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                   `json:"-"`
 	XXX_unrecognized     []byte                     `json:"-"`
@@ -182,6 +191,7 @@ func (*ClientConfig) ProtoMessage()    {}
 func (*ClientConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e86958e2cebd3303, []int{2}
 }
+
 func (m *ClientConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ClientConfig.Unmarshal(m, b)
 }
@@ -208,11 +218,11 @@ func (m *ClientConfig) GetServer() []*protocol.ServerEndpoint {
 }
 
 func init() {
+	proto.RegisterEnum("v2ray.core.proxy.socks.AuthType", AuthType_name, AuthType_value)
 	proto.RegisterType((*Account)(nil), "v2ray.core.proxy.socks.Account")
 	proto.RegisterType((*ServerConfig)(nil), "v2ray.core.proxy.socks.ServerConfig")
 	proto.RegisterMapType((map[string]string)(nil), "v2ray.core.proxy.socks.ServerConfig.AccountsEntry")
 	proto.RegisterType((*ClientConfig)(nil), "v2ray.core.proxy.socks.ClientConfig")
-	proto.RegisterEnum("v2ray.core.proxy.socks.AuthType", AuthType_name, AuthType_value)
 }
 
 func init() {

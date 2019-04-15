@@ -8,6 +8,7 @@ if [ "$DOTCNT" -gt 1 ]; then
   PRE="true"
 else
   PRE="false"
+  VER="${VER}.0"
 fi
 
 if [ -z "$PROJECT" ]; then
@@ -33,18 +34,11 @@ echo "Pushing changes"
 git push --follow-tags
 popd
 
-pushd $GOPATH/src/v2ray.com/ext
-echo "Adding a new tag: " "v$VER" "to ext"
-git tag -s -a "v$VER" -m "Version ${VER}"
-echo "Pushing changes to ext"
-git push --follow-tags
-popd
-
 echo "Launching build machine."
 DIR="$(dirname "$0")"
 RAND="$(openssl rand -hex 5)"
 gcloud compute instances create "v2raycore-${RAND}" \
-    --machine-type=n1-highcpu-2 \
+    --machine-type=n1-standard-2 \
     --metadata=release_tag=v${VER},prerelease=${PRE} \
     --metadata-from-file=startup-script=${DIR}/release-ci.sh \
     --zone=europe-west4-c \

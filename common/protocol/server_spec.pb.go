@@ -16,7 +16,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type ServerEndpoint struct {
 	Address              *net.IPOrDomain `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
@@ -33,6 +33,7 @@ func (*ServerEndpoint) ProtoMessage()    {}
 func (*ServerEndpoint) Descriptor() ([]byte, []int) {
 	return fileDescriptor_8741b2fa976e72fc, []int{0}
 }
+
 func (m *ServerEndpoint) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_ServerEndpoint.Unmarshal(m, b)
 }

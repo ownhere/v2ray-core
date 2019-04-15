@@ -15,7 +15,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Network int32
 
@@ -62,6 +62,7 @@ func (*NetworkList) ProtoMessage()    {}
 func (*NetworkList) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6a103d5ccb9e785e, []int{0}
 }
+
 func (m *NetworkList) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_NetworkList.Unmarshal(m, b)
 }
@@ -88,8 +89,8 @@ func (m *NetworkList) GetNetwork() []Network {
 }
 
 func init() {
-	proto.RegisterType((*NetworkList)(nil), "v2ray.core.common.net.NetworkList")
 	proto.RegisterEnum("v2ray.core.common.net.Network", Network_name, Network_value)
+	proto.RegisterType((*NetworkList)(nil), "v2ray.core.common.net.NetworkList")
 }
 
 func init() {

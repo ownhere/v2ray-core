@@ -7,6 +7,7 @@ import (
 
 	"v2ray.com/core/common/errors"
 	"v2ray.com/core/common/net"
+	"v2ray.com/core/common/protocol"
 )
 
 // ID of a session.
@@ -23,6 +24,8 @@ func NewID() ID {
 	}
 }
 
+// ExportIDToError transfers session.ID into an error object, for logging purpose.
+// This can be used with error.WriteToLog().
 func ExportIDToError(ctx context.Context) errors.ExportOption {
 	id := IDFromContext(ctx)
 	return func(h *errors.ExportOptionHolder) {
@@ -30,14 +33,53 @@ func ExportIDToError(ctx context.Context) errors.ExportOption {
 	}
 }
 
+// Inbound is the metadata of an inbound connection.
 type Inbound struct {
-	Source  net.Destination
+	// Source address of the inbound connection.
+	Source net.Destination
+	// Getaway address
 	Gateway net.Destination
-	Tag     string
+	// Tag of the inbound proxy that handles the connection.
+	Tag string
+	// User is the user that authencates for the inbound. May be nil if the protocol allows anounymous traffic.
+	User *protocol.MemoryUser
 }
 
+// Outbound is the metadata of an outbound connection.
 type Outbound struct {
-	Target      net.Destination
-	Gateway     net.Address
+	// Target address of the outbound connection.
+	Target net.Destination
+	// Gateway address
+	Gateway net.Address
+	// ResolvedIPs is the resolved IP addresses, if the Targe is a domain address.
 	ResolvedIPs []net.IP
+}
+
+type SniffingRequest struct {
+	OverrideDestinationForProtocol []string
+	Enabled                        bool
+}
+
+// Content is the metadata of the connection content.
+type Content struct {
+	// Protocol of current content.
+	Protocol string
+
+	SniffingRequest SniffingRequest
+
+	Attributes map[string]interface{}
+}
+
+func (c *Content) SetAttribute(name string, value interface{}) {
+	if c.Attributes == nil {
+		c.Attributes = make(map[string]interface{})
+	}
+	c.Attributes[name] = value
+}
+
+func (c *Content) Attribute(name string) interface{} {
+	if c.Attributes == nil {
+		return nil
+	}
+	return c.Attributes[name]
 }

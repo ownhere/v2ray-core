@@ -1,3 +1,5 @@
+// +build !confonly
+
 package shadowsocks
 
 import (
@@ -36,7 +38,7 @@ func ReadTCPSession(user *protocol.MemoryUser, reader io.Reader) (*protocol.Requ
 	ivLen := account.Cipher.IVSize()
 	var iv []byte
 	if ivLen > 0 {
-		if err := buffer.AppendSupplier(buf.ReadFullFrom(reader, ivLen)); err != nil {
+		if _, err := buffer.ReadFullFrom(reader, ivLen); err != nil {
 			return nil, nil, newError("failed to read IV").Base(err)
 		}
 
@@ -83,9 +85,9 @@ func ReadTCPSession(user *protocol.MemoryUser, reader io.Reader) (*protocol.Requ
 
 	if request.Option.Has(RequestOptionOneTimeAuth) {
 		actualAuth := make([]byte, AuthSize)
-		authenticator.Authenticate(buffer.Bytes())(actualAuth)
+		authenticator.Authenticate(buffer.Bytes(), actualAuth)
 
-		err := buffer.AppendSupplier(buf.ReadFullFrom(br, AuthSize))
+		_, err := buffer.ReadFullFrom(br, AuthSize)
 		if err != nil {
 			return nil, nil, newError("Failed to read OTA").Base(err)
 		}
@@ -142,10 +144,12 @@ func WriteTCPRequest(request *protocol.RequestHeader, writer io.Writer) (buf.Wri
 		header.SetByte(0, header.Byte(0)|0x10)
 
 		authenticator := NewAuthenticator(HeaderKeyGenerator(account.Key, iv))
-		common.Must(header.AppendSupplier(authenticator.Authenticate(header.Bytes())))
+		authPayload := header.Bytes()
+		authBuffer := header.Extend(AuthSize)
+		authenticator.Authenticate(authPayload, authBuffer)
 	}
 
-	if err := w.WriteMultiBuffer(buf.NewMultiBufferValue(header)); err != nil {
+	if err := w.WriteMultiBuffer(buf.MultiBuffer{header}); err != nil {
 		return nil, newError("failed to write header").Base(err)
 	}
 
@@ -196,7 +200,7 @@ func EncodeUDPPacket(request *protocol.RequestHeader, payload []byte) (*buf.Buff
 	buffer := buf.New()
 	ivLen := account.Cipher.IVSize()
 	if ivLen > 0 {
-		common.Must(buffer.Reset(buf.ReadFullFrom(rand.Reader, ivLen)))
+		common.Must2(buffer.ReadFullFrom(rand.Reader, ivLen))
 	}
 	iv := buffer.Bytes()
 
@@ -210,7 +214,9 @@ func EncodeUDPPacket(request *protocol.RequestHeader, payload []byte) (*buf.Buff
 		authenticator := NewAuthenticator(HeaderKeyGenerator(account.Key, iv))
 		buffer.SetByte(ivLen, buffer.Byte(ivLen)|0x10)
 
-		common.Must(buffer.AppendSupplier(authenticator.Authenticate(buffer.BytesFrom(ivLen))))
+		authPayload := buffer.BytesFrom(ivLen)
+		authBuffer := buffer.Extend(AuthSize)
+		authenticator.Authenticate(authPayload, authBuffer)
 	}
 	if err := account.Cipher.EncodePacket(account.Key, buffer); err != nil {
 		return nil, newError("failed to encrypt UDP payload").Base(err)
@@ -258,7 +264,7 @@ func DecodeUDPPacket(user *protocol.MemoryUser, payload *buf.Buffer) (*protocol.
 
 			authenticator := NewAuthenticator(HeaderKeyGenerator(account.Key, iv))
 			actualAuth := make([]byte, AuthSize)
-			common.Must2(authenticator.Authenticate(payload.BytesTo(payloadLen))(actualAuth))
+			authenticator.Authenticate(payload.BytesTo(payloadLen), actualAuth)
 			if !bytes.Equal(actualAuth, authBytes) {
 				return nil, nil, newError("invalid OTA")
 			}
@@ -287,7 +293,7 @@ type UDPReader struct {
 
 func (v *UDPReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 	buffer := buf.New()
-	err := buffer.AppendSupplier(buf.ReadFrom(v.Reader))
+	_, err := buffer.ReadFrom(v.Reader)
 	if err != nil {
 		buffer.Release()
 		return nil, err
@@ -297,7 +303,7 @@ func (v *UDPReader) ReadMultiBuffer() (buf.MultiBuffer, error) {
 		buffer.Release()
 		return nil, err
 	}
-	return buf.NewMultiBufferValue(payload), nil
+	return buf.MultiBuffer{payload}, nil
 }
 
 type UDPWriter struct {

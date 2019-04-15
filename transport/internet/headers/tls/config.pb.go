@@ -15,7 +15,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PacketConfig struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -29,6 +29,7 @@ func (*PacketConfig) ProtoMessage()    {}
 func (*PacketConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e55187b75c46dc0d, []int{0}
 }
+
 func (m *PacketConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PacketConfig.Unmarshal(m, b)
 }

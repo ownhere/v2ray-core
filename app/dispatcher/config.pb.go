@@ -15,7 +15,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type SessionConfig struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -29,6 +29,7 @@ func (*SessionConfig) ProtoMessage()    {}
 func (*SessionConfig) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90b7c41cce355532, []int{0}
 }
+
 func (m *SessionConfig) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SessionConfig.Unmarshal(m, b)
 }
@@ -60,6 +61,7 @@ func (*Config) ProtoMessage()    {}
 func (*Config) Descriptor() ([]byte, []int) {
 	return fileDescriptor_90b7c41cce355532, []int{1}
 }
+
 func (m *Config) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Config.Unmarshal(m, b)
 }

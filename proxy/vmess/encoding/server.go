@@ -2,6 +2,7 @@ package encoding
 
 import (
 	"crypto/md5"
+	"encoding/binary"
 	"hash/fnv"
 	"io"
 	"sync"
@@ -15,7 +16,6 @@ import (
 	"v2ray.com/core/common/crypto"
 	"v2ray.com/core/common/net"
 	"v2ray.com/core/common/protocol"
-	"v2ray.com/core/common/serial"
 	"v2ray.com/core/common/task"
 	"v2ray.com/core/proxy/vmess"
 )
@@ -125,7 +125,7 @@ func (s *ServerSession) DecodeRequestHeader(reader io.Reader) (*protocol.Request
 	buffer := buf.New()
 	defer buffer.Release()
 
-	if err := buffer.AppendSupplier(buf.ReadFullFrom(reader, protocol.IDBytesLen)); err != nil {
+	if _, err := buffer.ReadFullFrom(reader, protocol.IDBytesLen); err != nil {
 		return nil, newError("failed to read request header").Base(err)
 	}
 
@@ -134,13 +134,14 @@ func (s *ServerSession) DecodeRequestHeader(reader io.Reader) (*protocol.Request
 		return nil, newError("invalid user")
 	}
 
-	iv := md5.Sum(hashTimestamp(timestamp))
-	vmessAccount := user.Account.(*vmess.InternalAccount)
+	iv := hashTimestamp(md5.New(), timestamp)
+	vmessAccount := user.Account.(*vmess.MemoryAccount)
 
 	aesStream := crypto.NewAesDecryptionStream(vmessAccount.ID.CmdKey(), iv[:])
 	decryptor := crypto.NewCryptionReader(aesStream, reader)
 
-	if err := buffer.Reset(buf.ReadFullFrom(decryptor, 38)); err != nil {
+	buffer.Clear()
+	if _, err := buffer.ReadFullFrom(decryptor, 38); err != nil {
 		return nil, newError("failed to read request header").Base(err)
 	}
 
@@ -178,19 +179,19 @@ func (s *ServerSession) DecodeRequestHeader(reader io.Reader) (*protocol.Request
 	}
 
 	if padingLen > 0 {
-		if err := buffer.AppendSupplier(buf.ReadFullFrom(decryptor, int32(padingLen))); err != nil {
+		if _, err := buffer.ReadFullFrom(decryptor, int32(padingLen)); err != nil {
 			return nil, newError("failed to read padding").Base(err)
 		}
 	}
 
-	if err := buffer.AppendSupplier(buf.ReadFullFrom(decryptor, 4)); err != nil {
+	if _, err := buffer.ReadFullFrom(decryptor, 4); err != nil {
 		return nil, newError("failed to read checksum").Base(err)
 	}
 
 	fnv1a := fnv.New32a()
 	common.Must2(fnv1a.Write(buffer.BytesTo(-4)))
 	actualHash := fnv1a.Sum32()
-	expectedHash := serial.BytesToUint32(buffer.BytesFrom(-4))
+	expectedHash := binary.BigEndian.Uint32(buffer.BytesFrom(-4))
 
 	if actualHash != expectedHash {
 		return nil, newError("invalid auth")
@@ -213,7 +214,7 @@ func (s *ServerSession) DecodeRequestBody(request *protocol.RequestHeader, reade
 	if request.Option.Has(protocol.RequestOptionChunkMasking) {
 		sizeParser = NewShakeSizeParser(s.requestBodyIV[:])
 	}
-	var padding crypto.PaddingLengthGenerator = nil
+	var padding crypto.PaddingLengthGenerator
 	if request.Option.Has(protocol.RequestOptionGlobalPadding) {
 		padding = sizeParser.(crypto.PaddingLengthGenerator)
 	}
@@ -292,7 +293,7 @@ func (s *ServerSession) EncodeResponseBody(request *protocol.RequestHeader, writ
 	if request.Option.Has(protocol.RequestOptionChunkMasking) {
 		sizeParser = NewShakeSizeParser(s.responseBodyIV[:])
 	}
-	var padding crypto.PaddingLengthGenerator = nil
+	var padding crypto.PaddingLengthGenerator
 	if request.Option.Has(protocol.RequestOptionGlobalPadding) {
 		padding = sizeParser.(crypto.PaddingLengthGenerator)
 	}
