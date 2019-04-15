@@ -107,9 +107,10 @@ func (s *ClassicNameServer) Cleanup() error {
 func (s *ClassicNameServer) HandleResponse(ctx context.Context, payload *buf.Buffer) {
 	msg := new(dns.Msg)
 	err := msg.Unpack(payload.Bytes())
+	/*
 	if err == dns.ErrTruncated {
 		newError("truncated message received. DNS server should still work. If you see anything abnormal, please submit an issue to v2ray-core.").AtWarning().WriteToLog()
-	} else if err != nil {
+	} else */if err != nil {
 		newError("failed to parse DNS response").Base(err).AtWarning().WriteToLog()
 		return
 	}
